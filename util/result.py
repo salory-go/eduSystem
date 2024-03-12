@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 class Result(BaseModel):
     msg: Union[None, str]
-    code: int
     data: Union[object, None]
 
     @staticmethod

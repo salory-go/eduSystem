@@ -1,6 +1,8 @@
+from typing import Optional
+
 from fastapi import APIRouter
 from datetime import datetime
-from pojo.dto import addUserDTO
+from pojo.dto import UserDTO
 from pojo.entity import User
 from util.result import Result
 
@@ -14,10 +16,19 @@ async def getUsers():
 
 
 @admin.post("/user")
-async def addUser(userDTO: addUserDTO):
-    userDTO.personalization = ""  # 根据需要设置personalization属性
-    userDTO.createTime = datetime.utcnow()  # 将createTime属性设置为当前的UTC时间
-    userDTO.updateTime = datetime.utcnow()  # 将createTime属性设置为当前的UTC时间
-    print(userDTO)
-    # result = await User.save(**userDTO)
-    return Result.success()
+async def addUser(userDTO: Optional[UserDTO]):
+    if userDTO:
+        time = datetime.utcnow()  # 将createTime和updateTime属性设置为当前的UTC时间
+        user_data = userDTO.dict()
+        user_data.update({
+            "personalization": "",
+            "createTime": time,
+            "updateTime": time
+        })
+        result = await User(**user_data).save()
+        print(result)
+        return Result.success()
+    else:
+        return Result.error("用户信息为空")
+
+
