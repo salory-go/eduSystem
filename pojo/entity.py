@@ -4,12 +4,12 @@ from tortoise import fields
 
 class User(Model):
     id = fields.IntField(pk=True)
-    username = fields.CharField(max_length=32, description="姓名", unique=True)
+    userNumber = fields.CharField(max_length=32, description="姓名", unique=True)
     password = fields.CharField(max_length=32, description="密码")
     email = fields.CharField(max_length=32, description="电子邮箱", unique=True)
     name = fields.CharField(max_length=32, description="名称")
     role = fields.IntField(description="角色(1.教师2.管理员3.学生)")
-    personalization = fields.CharField(description="个性化内容")  # 格式待定
+    personalization = fields.CharField(max_length=32,description="个性化内容")  # 格式待定
     createTime = fields.DatetimeField(description="创建时间")
     updateTime = fields.DatetimeField(description="更新时间")
 
@@ -32,7 +32,7 @@ class Question(Model):
     id = fields.IntField(pk=True)
     courseId = fields.IntField()
     userId = fields.IntField(description="教师ID")
-    chapter = fields.CharField(description="章节")
+    chapter = fields.CharField(max_length=32,description="章节")
     content = fields.CharField(max_length=500, description="题目内容")
     answer = fields.CharField(max_length=500, description="题目答案")
     difficulty = fields.IntField(description="题目难度(1.简单2.中等3.困难")
@@ -57,7 +57,7 @@ class Assignment_Question(Model):
     id = fields.IntField(pk=True)
     assignmentId = fields.IntField(description="作业ID")
     userId = fields.IntField(description="学生ID")
-    questionIds = fields.CharField(description="题目列表")
+    questionIds = fields.CharField(max_length=100,description="题目列表")
 
 
 class Student_Answer(Model):
