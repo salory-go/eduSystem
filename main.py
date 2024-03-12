@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI,Request,Response
 from tortoise.contrib.fastapi import register_tortoise
 
-from configuration.dbConfig import TORTOISE_ORM
+from config.dbConfig import TORTOISE_ORM
 from server.admin.router import admin
 from server.common.router import common
 from util.result import Result

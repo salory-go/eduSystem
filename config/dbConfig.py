@@ -1,15 +1,13 @@
-# apps/dbConfig.py
-
 TORTOISE_ORM = {
     "connections": {
-        # "mysql://root:lzs@localhost:3306/water_manager",
+        # "mysql://root:1234@localhost:3306/water_manager",
         "default": {
             'engine': 'tortoise.backends.mysql',
             'credentials': {
                 'host': 'localhost',
                 'port': '3306',
                 'user': 'root',
-                'password': 'lzs',
+                'password': '1234',
                 'database': 'eduSystem',
                 'minsize': 1,
                 'maxsize': 5,
