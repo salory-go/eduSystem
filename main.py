@@ -3,7 +3,9 @@ from fastapi import FastAPI,Request,Response
 from tortoise.contrib.fastapi import register_tortoise
 
 from config.dbConfig import TORTOISE_ORM
-from server.admin.router import admin
+from server.admin.course import course
+
+from server.admin.user import user
 from server.common.router import common
 from util.result import Result
 import json
@@ -17,7 +19,8 @@ register_tortoise(
 )
 
 app.include_router(common,tags=["普通接口"])
-app.include_router(admin, prefix="/admin", tags=["管理员接口"])
+app.include_router(user , tags=["管理员接口"])
+app.include_router(course, tags=["管理员接口"])
 
 
 # @app.middleware("http")
