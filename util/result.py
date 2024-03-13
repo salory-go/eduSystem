@@ -4,12 +4,12 @@ from pydantic import BaseModel
 
 
 class Result(BaseModel):
-    msg: Union[None, str]
+    msg: Union[str, None]
     data: Union[object, None]
 
     @staticmethod
-    def success(object=None):
-        return Result(msg="success", data=object)
+    def success(data=None):
+        return Result(msg="操作成功", data=data)
 
     @staticmethod
     def error(msg=None):

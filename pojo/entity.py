@@ -9,13 +9,14 @@ class User(Model):
     email = fields.CharField(max_length=32, description="电子邮箱", unique=True)
     name = fields.CharField(max_length=32, description="姓名")
     role = fields.IntField(description="角色(1.教师2.管理员3.学生)")
-    personalization = fields.CharField(max_length=32,description="个性化内容")  # 格式待定
+    personalization = fields.CharField(max_length=32, description="个性化内容")  # 格式待定
     createTime = fields.DatetimeField(description="创建时间")
     updateTime = fields.DatetimeField(description="更新时间")
 
 
 class Course(Model):
     id = fields.IntField(pk=True)
+    image = fields.CharField(max_length=32, description="课程头像")
     courseName = fields.CharField(max_length=32, description="课程名称", unique=True)
     userId = fields.IntField(description="教师ID")
     createTime = fields.DatetimeField(description="创建时间")
@@ -32,11 +33,10 @@ class Question(Model):
     id = fields.IntField(pk=True)
     courseId = fields.IntField()
     userId = fields.IntField(description="教师ID")
-    chapter = fields.CharField(max_length=32,description="章节")
-    content = fields.CharField(max_length=500, description="题目内容")
-    answer = fields.CharField(max_length=500, description="题目答案")
+    chapter = fields.CharField(max_length=32, description="章节")
+    content = fields.TextField(max_length=500, description="题目内容")
+    answer = fields.TextField(max_length=500, description="题目答案")
     difficulty = fields.IntField(description="题目难度(1.简单2.中等3.困难")
-    topic = fields.CharField(max_length=32, description="知识点")
     createTime = fields.DatetimeField(description="创建时间")
     updateTime = fields.DatetimeField(description="更新时间")
 
@@ -57,14 +57,14 @@ class Assignment_Question(Model):
     id = fields.IntField(pk=True)
     assignmentId = fields.IntField(description="作业ID")
     userId = fields.IntField(description="学生ID")
-    questionIds = fields.CharField(max_length=100,description="题目列表")
+    questionIds = fields.CharField(max_length=100, description="题目列表")
 
 
 class Student_Answer(Model):
     id = fields.IntField(pk=True)
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
-    studentAnswer = fields.CharField(max_length=500, description="学生答案")
+    studentAnswer = fields.TextField(max_length=500, description="学生答案")
     isCorrect = fields.BooleanField(description="学生答案是否正确")
     submitTime = fields.DatetimeField(description="提交时间")
 
