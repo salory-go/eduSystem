@@ -1,61 +1,81 @@
 from datetime import datetime
 
 from fastapi import APIRouter
-from typing import Optional, List
-from tortoise.queryset import Q
+from typing import Optional
 
-from pojo.entity import Question
-from pojo.dto import QuestionDTO
+from pojo.entity import Question, Course, Chapter
+from pojo.dto import QuestionDTO, QuestionListDTO
+from pojo.vo import QuestionVO
 from util.result import Result
 
-question = APIRouter()
+teacher_question = APIRouter()
 
 
-@question.get("/teacher/question/{userId}")
-async def get_question(userId: int,
-                       courseId: Optional[int] = None,
-                       chapter: Optional[int] = None,
-                       difficulty: Optional[int] = None,
-                       topicIds: Optional[List[int]] = None):
+@teacher_question.get("/teacher/question/{userId}")
+async def get_questions(userId: int,
+                        courseId: Optional[int] = None,
+                        chapterId: Optional[int] = None,
+                        difficulty: Optional[int] = None):
     filters = {
         'userId': userId,
         'courseId': courseId,
-        'chapter': chapter,
-        'difficulty': difficulty,
+        'chapterId': chapterId,
+        'difficulty': difficulty
     }
     # 移除值为 None 的键
     filters = {k: v for k, v in filters.items() if v is not None}
-    # TODO
-    query = Q(**filters)
-    if topicIds is not None:
-        # query &= Q(id__in=Question_Topic.filter(topicId__in=topicIds).values("questionId"))
 
-    questions = await Question.filter(query).values()
+    questions = await Question.filter(**filters).values('id', 'content', 'answer', 'courseId', 'chapterId',
+                                                        'difficulty', 'createTime')
+    questionList = []
+    for q in questions:
+        questionVO = QuestionVO(id=q['id'], content=q['content'], answer=q['answer'], difficulty=q['difficulty'],
+                                createTime=q['createTime'])
+
+        course = await Course.get(id=q['courseId'])
+        questionVO.courseName = course.id
+
+        chapter = await Chapter.get(id=q['chapterId'])
+        questionVO.courseName = chapter.id
+
+        questionList.append(questionVO)
+
+    return Result.success(questionList)
+
+
+@teacher_question.post("/teacher/question/new")
+async def new_questions(questionDTO: QuestionDTO):
+    query = questionDTO.model_dump(exclude_unset=True)
+
+    # TODO 使用模型生成新题目
+    questions = [{}, {}, {}]
+
     return Result.success(questions)
 
 
-@question.post("/teacher/question/new")
-async def create_question(tags: QuestionDTO):
-    tags = tags.model_dump(exclude_unset=True)
+@teacher_question.post("/teacher/question")
+async def add_questions(questionList: QuestionListDTO):
+    userId = questionList.userId
+    questions = questionList.questions
 
-    # 模拟使用模型生成新题目
-    new_question = ""
-
-    return Result.success(new_question)
-
-
-@question.post("/teacher/question")
-async def add_question(questions: List[QuestionDTO]):
     for q in questions:
-        q.createTime = datetime.now()
-        q.updateTime = datetime.now()
         q = q.model_dump(exclude_unset=True)
-        await Question.create(**q)
+        question = Question(userId=userId, content=q['content'], answer=q['answer'], difficulty=q['difficulty'],
+                            createTime=datetime.now(), updateTime=datetime.now())
 
+        course = await Course.get(courseName=q['courseName'])
+        question.courseId = course.id
+
+        chapter = await Chapter.get(chapterName=q['chapterName'])
+        question.chapterId = chapter.id
+
+        await question.save()
     return Result.success()
 
 
-@question.delete("/teacher/question")
-async def del_question(questionIds: List[int]):
-    await Question.filter(id__in=questionIds).delete()
+@teacher_question.delete("/teacher/question")
+async def del_question(questionId: int):
+    await Question.filter(id=questionId).delete()
+
+    # TODO 删除关联的所有..
     return Result.success()

@@ -31,12 +31,20 @@ class Student_Course(Model):
 
 class Question(Model):
     id = fields.IntField(pk=True)
-    courseId = fields.IntField()
+    courseId = fields.IntField(description="课程ID")
+    chapterId = fields.IntField(description="章节ID")
     userId = fields.IntField(description="教师ID")
-    chapter = fields.CharField(max_length=32, description="章节")
     content = fields.TextField(max_length=500, description="题目内容")
     answer = fields.TextField(max_length=500, description="题目答案")
     difficulty = fields.IntField(description="题目难度(1.简单2.中等3.困难")
+    createTime = fields.DatetimeField(description="创建时间")
+    updateTime = fields.DatetimeField(description="更新时间")
+
+
+class Chapter(Model):
+    id = fields.IntField(pk=True)
+    chapterName = fields.CharField(max_length=32, description="章节名称")
+    courseId = fields.IntField(description="课程ID")
     createTime = fields.DatetimeField(description="创建时间")
     updateTime = fields.DatetimeField(description="更新时间")
 
@@ -46,9 +54,9 @@ class Assignment(Model):
     courseId = fields.IntField(description="课程ID")
     userId = fields.IntField(description="教师ID")
     title = fields.CharField(max_length=32, description="作业标题")
-    description = fields.CharField(max_length=500, description="作业描述")
     deadline = fields.DatetimeField(description="截止时间")
     overdue = fields.BooleanField(description="是否过期")
+    isPersonalized = fields.BooleanField(description="是否个性化")
     createTime = fields.DatetimeField(description="创建时间")
     updateTime = fields.DatetimeField(description="更新时间")
 
@@ -65,7 +73,7 @@ class Student_Answer(Model):
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
     studentAnswer = fields.TextField(max_length=500, description="学生答案")
-    isCorrect = fields.BooleanField(description="学生答案是否正确")
+    score = fields.FloatField(description="学生答案分数")
     submitTime = fields.DatetimeField(description="提交时间")
 
 
@@ -83,13 +91,6 @@ class Star(Model):
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
     createTime = fields.DatetimeField(description="创建时间")
-
-# class Suggestion(Model):
-#     id = fields.IntField(pk=True)
-#     studentId = fields.IntField(description="学生ID")
-#     content = fields.CharField(max_length=500,description="建议内容")
-#     createTime = fields.DatetimeField(description="创建时间")
-#     updateTime = fields.DatetimeField(description="更新时间")
 
 # class Exam(Model):
 #     id = fields.IntField(pk=True)
