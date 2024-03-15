@@ -1,32 +1,33 @@
-
 from typing import Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from datetime import datetime
 from pojo.dto import UserDTO, CourseDTO
 from pojo.entity import User, Course
 from util.result import Result
 from typing import List
 
-user = APIRouter()
+admin_user = APIRouter()
 
 
-@user.get("/admin/user")
-async def getUsers(role: int):
+@admin_user.get("/admin/user")
+async def get_users(role: int):
     try:
         # 使用 fetch 方法而不是 values
-        users = await User.filter(role=role).values()
+        users = await User.filter(role=role).values("id","userNumber","name","email")
         return Result.success(users)
     except Exception as e:
         print(f"Error getting users: {e}")
         return Result.error("获取用户列表时发生错误")
 
 
-@user.post("/admin/user")
-async def addUser(userDTO: UserDTO):
+@admin_user.post("/admin/user")
+async def add_user(userDTO: UserDTO):
     if userDTO:
+        print(userDTO)
         time = datetime.utcnow()  # 将createTime和updateTime属性设置为当前的UTC时间
-        user_data = userDTO.dict()
+        user_data = userDTO.model_dump(exclude_unset=True)
+        print(user_data)
         user_data.update({
             "personalization": "",
             "createTime": time,
@@ -37,20 +38,9 @@ async def addUser(userDTO: UserDTO):
     else:
         return Result.error("用户信息为空")
 
-@user.delete("/admin/user")
-async def deleteUserByIds(userIds: List[int]):
-    print(userIds)
-    try:
-        for user_id in userIds:
-            # 使用 await 删除用户
-            delete = await User.filter(id=user_id).delete()
-            if delete:
-                print(f"User with ID {user_id} deleted successfully.")
-            else:
-                print(f"User with ID {user_id} not found.")
-    except Exception as e:
-        print(f"Error deleting users: {e}")
-        return Result.error("删除用户时发生错误")
 
+@admin_user.delete("/admin/user")
+async def deleteUserByIds(userId: int):
+    # TODO 删除关联的所有..
+    delete = await User.filter(id=userId).delete()
     return Result.success("用户删除成功")
-
