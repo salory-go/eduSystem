@@ -10,7 +10,7 @@ from util.result import Result
 student_assignment = APIRouter()
 
 
-@student_assignment.get("/student/assignment")
+@student_assignment.get("/assignment")
 async def get_assignments(userId: int, courseId: Optional[int] = None):
     # completed score submitTime userId assignmentId
     assignments = await Student_Assignment.filter(userId=userId)
@@ -36,7 +36,7 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
     return Result.success(assignmentList)
 
 
-@student_assignment.get("/student/assignment/detail")
+@student_assignment.get("/assignment/detail")
 async def get_assignment_detail(userId: int, assignmentId: int):
     # 通过assignmentId查询assignment_question的questionIds
     q = await Assignment_Question.get(userId=userId, assignmentId=assignmentId)
@@ -50,7 +50,7 @@ async def get_assignment_detail(userId: int, assignmentId: int):
     return Result.success(questionList)
 
 
-@student_assignment.post("/student/assignment")
+@student_assignment.post("/assignment")
 async def submit_assignment(answerListDTO: AnswerListDTO):
     # 通过两个id来查询答案和学生表
     for answer in answerListDTO.answers:

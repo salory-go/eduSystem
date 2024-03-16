@@ -7,13 +7,13 @@ from tortoise.exceptions import DoesNotExist
 student_course = APIRouter()
 
 
-@student_course.get("/student/course")
+@student_course.get("/course")
 async def get_courses():
     courseList = await Course.all().values("id", "image", "courseName", "teacherName", "createTime")
     return Result.success(courseList)
 
 
-@student_course.get("/student/course")
+@student_course.get("/course")
 async def get_my_courses(user_id: int):
     courses = await Student_Course.filter(userId=user_id).values('courseId', 'joinTime')
     courseList = []
@@ -27,7 +27,7 @@ async def get_my_courses(user_id: int):
     return Result.success(courseList)
 
 
-@student_course.post("/student/Course")
+@student_course.post("/Course")
 async def add_course(userId: int, courseId: int):
     # 检验是否有该课程
     try:

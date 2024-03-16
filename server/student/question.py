@@ -7,10 +7,10 @@ from pojo.entity import Course, Question, Chapter, Student_Answer
 from pojo.vo import QuestionVO, ReferenceVO
 from util.result import Result
 
-student_practice = APIRouter()
+student_question = APIRouter()
 
 
-@student_practice.get("/student/question")
+@student_question.get("/question")
 async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int] = None,
                         chapterId: Optional[int] = None):
     query = {
@@ -34,7 +34,7 @@ async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int
     return Result.success(questionList)
 
 
-@student_practice.post("/student/question")
+@student_question.post("/question")
 async def submit_answer(answerDTO: AnswerDTO):
     # TODO 打分
     score = 100
@@ -50,7 +50,7 @@ async def submit_answer(answerDTO: AnswerDTO):
     return Result.success()
 
 
-@student_practice.get("/student/question/reference")
+@student_question.get("/question/reference")
 async def get_reference(questionId: int):
     question = await Question.get(id=questionId).values("courseId", "chapterId", "content", "answer")
     course = await Course.get(id=question['courseId'])
@@ -64,7 +64,7 @@ async def get_reference(questionId: int):
     return Result.success(reference)
 
 
-@student_practice.get("/student/question/history")
+@student_question.get("/question/history")
 async def get_reference(userId: int, questionId: int):
     studentAnswer = await Student_Answer.filter(userId=userId, questionId=questionId).first().values('studentAnswer',
                                                                                                      'score',
