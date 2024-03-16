@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from datetime import datetime
 from pojo.dto import CourseDTO
 from pojo.entity import User, Course
 from pojo.vo import CourseVO
@@ -18,7 +17,7 @@ async def get_courses():
                                    courseName=course['courseName'],
                                    image=course['image'],
                                    teacherName=user.name,
-                                   createTime=course['createTime']
+                                   joinTime=course['createTime']
                                    ))
     return Result.success(courseList)
 

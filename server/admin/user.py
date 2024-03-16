@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from datetime import datetime
 from pojo.dto import UserDTO
 from pojo.entity import User
 from util.result import Result
