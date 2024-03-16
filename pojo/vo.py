@@ -35,7 +35,9 @@ class CourseVO(BaseModel):
     image: str
     courseName: str
     teacherName: str
-    joinTime: datetime
+    joinTime: Optional[datetime] = None
+    createTime: Optional[datetime] = None
+
 
 class ReferenceVO(BaseModel):
     idea: str
