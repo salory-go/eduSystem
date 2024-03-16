@@ -44,8 +44,11 @@ async def get_assignment_detail(userId: int, assignmentId: int):
     # 用questionIds查询content、difficulty、两个time
     questionList = []
     for qId in questionIds:
-        question = await Question.get(id=qId).values("id", "content", "difficulty")
-        questionList.append(question)
+        try:
+            question = await Question.get(id=qId).values("id", "content", "difficulty")
+            questionList.append(question)
+        finally:
+            continue
 
     return Result.success(questionList)
 
