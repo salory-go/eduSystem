@@ -10,41 +10,29 @@ class LoginVO(BaseModel):
 
 
 class QuestionVO(BaseModel):
-    id: Optional[int] = None
-    courseName: Optional[str] = None
-    chapterName: Optional[str] = None
-    difficulty: Optional[int] = None
-    content: Optional[str] = None
-    answer: Optional[str] = None
-    createTime: Optional[datetime] = None
+    id: int
+    courseName: str
+    chapterName: str
+    difficulty: int
+    content: str
+    answer: str
+    createTime: datetime
 
 
 class AssignmentVO(BaseModel):
-    id: Optional[int] = None
-    courseName: Optional[str] = None
-    title: Optional[str] = None
-    deadline: Optional[str] = None
-    overdue: Optional[bool] = None
+    id: int
+    courseName: str
+    title: str
+    deadline: str
+    overdue: bool
     completed: Optional[bool] = None
     score: Optional[int] = None
-    createTime: Optional[datetime] = None
+    createTime: datetime
 
 
 class CourseVO(BaseModel):
-    id: Optional[int] = None
-    image: Optional[str] = None
-    courseName: Optional[str] = None
-    teacherName: Optional[str] = None
-    joinTime: Optional[datetime] = None
-
-
-class StarVO(BaseModel):
-    id: Optional[int] = None
-    courseId: Optional[int] = None
-    userId: Optional[int] = None
-    content: Optional[str] = None
-    chapter: Optional[str] = None
-    answer: Optional[str] = None
-    difficulty: Optional[int] = None
-    createTime: Optional[datetime] = None
-    updateTime: Optional[datetime] = None
+    id: int
+    image: str
+    courseName: str
+    teacherName: str
+    joinTime: datetime
