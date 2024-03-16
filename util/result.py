@@ -12,5 +12,5 @@ class Result(BaseModel):
         return Result(msg="操作成功", data=data)
 
     @staticmethod
-    def error(msg=None):
+    def error(msg='操作失败'):
         return Result(msg=msg, data=None)
