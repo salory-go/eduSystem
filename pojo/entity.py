@@ -9,7 +9,7 @@ class User(Model):
     email = fields.CharField(max_length=32, description="电子邮箱", unique=True)
     name = fields.CharField(max_length=32, description="姓名")
     role = fields.IntField(description="角色(1.教师2.管理员3.学生)")
-    personalization = fields.CharField(max_length=32, description="个性化内容")  # 格式待定
+    personalization = fields.CharField(max_length=32, description="个性化内容", default="")  # 格式待定
     createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
     updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
