@@ -32,3 +32,5 @@ async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int
         questionList.append(questionVO)
 
     return Result.success(questionList)
+
+

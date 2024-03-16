@@ -1,6 +1,8 @@
 from fastapi import APIRouter
-from pojo.entity import Course, Assignment, Student_Course, Star, Question, Chapter
-from pojo.vo import AssignmentVO, StarVO
+from tortoise.exceptions import DoesNotExist
+
+from pojo.entity import Course, Star, Question, Chapter
+from pojo.vo import StarVO
 from util.result import Result
 
 student_star = APIRouter()
@@ -21,3 +23,20 @@ async def get_stars(userId: int):
         starList.append(starVO)
 
     return Result.success(starList)
+
+
+@student_star.post("/student/star")
+async def add_star(userId: int, questionId: int):
+    try:
+        await Star.get(userId=userId, questionId=questionId)
+        # TODO 返回400状态码
+        return Result.error('已在收藏中！')
+    except DoesNotExist:
+        await Star.create(userId=userId, questionId=questionId)
+        return Result.success()
+
+
+@student_star.delete("/student/star")
+async def del_star(starId: int):
+    await Star.filter(id=starId).delete()
+    return Result.success()

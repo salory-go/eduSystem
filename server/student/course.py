@@ -20,8 +20,8 @@ async def get_my_courses(user_id: int):
     for c in courses:
         course = await Course.get(id=c['courseId']).values('id', 'image', 'courseName', 'userId')
         user = await User.get(id=c['userId']).values('name')
-        courseVO = CourseVO(id=c['courseId'], image=c['image'], courseName=c['courseName'], teacherName=user['name'],
-                            joinTime=c['joinTime'])
+        courseVO = CourseVO(id=course['courseId'], image=course['image'], courseName=course['courseName'],
+                            teacherName=user['name'], joinTime=c['joinTime'])
         courseList.append(courseVO)
 
     return Result.success(courseList)
