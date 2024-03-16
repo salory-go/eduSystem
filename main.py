@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request, Response
+from fastapi_cdn_host import monkey_patch_for_docs_ui
 from tortoise.contrib.fastapi import register_tortoise
 
 from config.dbConfig import TORTOISE_ORM
@@ -17,9 +18,11 @@ register_tortoise(
 )
 
 app.include_router(common, tags=["普通接口"])
-app.include_router(admin, tags=["管理员接口"])
-app.include_router(teacher, tags=["教师接口"])
-app.include_router(student, tags=["学生接口"])
+app.include_router(admin, prefix='/admin', tags=["管理员接口"])
+app.include_router(teacher, prefix='/teacher', tags=["教师接口"])
+app.include_router(student, prefix='/student', tags=["学生接口"])
+
+monkey_patch_for_docs_ui(app)
 
 # @app.middleware("http")
 # async def m1(request: Request,call_next):
@@ -30,4 +33,4 @@ app.include_router(student, tags=["学生接口"])
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", port=8081, reload=True)
+    uvicorn.run("main:app", port=8000, reload=True)
