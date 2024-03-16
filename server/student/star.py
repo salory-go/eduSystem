@@ -8,7 +8,7 @@ from util.result import Result
 student_star = APIRouter()
 
 
-@student_star.get("/student/star")
+@student_star.get("/star")
 async def get_stars(userId: int):
     stars = await Star.filter(userId=userId).values('questionId', 'createTime')
 
@@ -19,13 +19,13 @@ async def get_stars(userId: int):
         chapter = await Chapter.get(id=q["chapterId"]).values('chapterName')
 
         starVO = QuestionVO(id=q["id"], courseName=course["courseName"], chapterName=chapter["chapterName"],
-                        content=q["content"], difficulty=q["difficulty"], createTime=q["createTime"])
+                            content=q["content"], difficulty=q["difficulty"], createTime=q["createTime"])
         starList.append(starVO)
 
     return Result.success(starList)
 
 
-@student_star.post("/student/star")
+@student_star.post("/star")
 async def add_star(userId: int, questionId: int):
     try:
         await Star.get(userId=userId, questionId=questionId)
@@ -36,7 +36,7 @@ async def add_star(userId: int, questionId: int):
         return Result.success()
 
 
-@student_star.delete("/student/star")
+@student_star.delete("/star")
 async def del_star(starId: int):
     await Star.filter(id=starId).delete()
     return Result.success()
