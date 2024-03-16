@@ -1,10 +1,10 @@
 from typing import Optional
 
 from fastapi import APIRouter
-from datetime import datetime
-from pojo.dto import UserDTO, CourseDTO
-from pojo.entity import User, Course, Assignment, Student_Course, Question, Chapter
-from pojo.vo import AssignmentVO, QuestionVO
+
+from pojo.dto import AnswerDTO
+from pojo.entity import Course, Question, Chapter, Student_Answer
+from pojo.vo import QuestionVO
 from util.result import Result
 
 student_practice = APIRouter()
@@ -34,3 +34,28 @@ async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int
     return Result.success(questionList)
 
 
+@student_practice.post("/student/question")
+async def submit_answer(answerDTO: AnswerDTO):
+    # TODO 打分
+    score = 100
+    studentAnswer = await Student_Answer.filter(userId=answerDTO.userId, questionId=answerDTO.questionId).first()
+
+    if studentAnswer:
+        await Student_Answer.filter(userId=answerDTO.userId, questionId=answerDTO.questionId).update(
+            studentAnswer=answerDTO.studentAnswer, score=score)
+    else:
+        await Student_Answer.create(userId=answerDTO.userId, questionId=answerDTO.questionId,
+                                    studentAnswer=answerDTO.studentAnswer, score=score)
+
+    return Result.success()
+
+
+@student_practice.get("/student/question/history")
+async def get_reference(userId: int, questionId: int):
+    studentAnswer = await Student_Answer.filter(userId=userId, questionId=questionId).first().values('studentAnswer',
+                                                                                                     'score',
+                                                                                                     'submitTime')
+    if studentAnswer:
+        return Result.success(studentAnswer)
+    else:
+        return Result.error('未曾作答')

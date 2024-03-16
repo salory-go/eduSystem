@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter
-from datetime import datetime
+
 from pojo.dto import AnswerListDTO
 from pojo.entity import Course, Assignment, Student_Assignment, Assignment_Question, Question, Student_Answer
 from pojo.vo import AssignmentVO
@@ -22,9 +22,9 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
         if courseId and assignment.courseId != courseId:
             continue
 
-        course = await Course.get(id=assignment.courseId)
+        course = await Course.get(id=assignment.courseId).values('courseName')
         assignmentVO = AssignmentVO(id=assignment.id,
-                                    courseName=course.courseName,
+                                    courseName=course['courseName'],
                                     title=assignment.title,
                                     deadline=assignment.deadline,
                                     overdue=assignment.overdue,
@@ -56,8 +56,14 @@ async def submit_assignment(answerListDTO: AnswerListDTO):
     for answer in answerListDTO.answers:
         # TODO 打分
         score = 100
-        await Student_Answer.create(userId=answerListDTO.userId, questionId=answer.questionId,
-                                    studentAnswer=answer.studentAnswer, score=score)
+        studentAnswer = await Student_Answer.filter(userId=answerListDTO.userId, questionId=answer.questionId).first()
+
+        if studentAnswer:
+            await Student_Answer.filter(userId=answerListDTO.userId, questionId=answer.questionId).update(
+                studentAnswer=answer.studentAnswer, score=score)
+        else:
+            await Student_Answer.create(userId=answerListDTO.userId, questionId=answer.questionId,
+                                        studentAnswer=answer.studentAnswer, score=score)
     # TODO 加权评分
     score = 100
     await Student_Assignment.filter(userId=answerListDTO.userId, assignmentId=answerListDTO.assignmentId).update(

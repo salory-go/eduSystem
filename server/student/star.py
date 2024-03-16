@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from tortoise.exceptions import DoesNotExist
 
 from pojo.entity import Course, Star, Question, Chapter
-from pojo.vo import StarVO
+from pojo.vo import QuestionVO
 from util.result import Result
 
 student_star = APIRouter()
@@ -18,7 +18,7 @@ async def get_stars(userId: int):
         course = await Course.get(id=q["courseId"]).values('courseName')
         chapter = await Chapter.get(id=q["chapterId"]).values('chapterName')
 
-        starVO = StarVO(id=q["id"], courseName=course["courseName"], chapterName=chapter["chapterName"],
+        starVO = QuestionVO(id=q["id"], courseName=course["courseName"], chapterName=chapter["chapterName"],
                         content=q["content"], difficulty=q["difficulty"], createTime=q["createTime"])
         starList.append(starVO)
 
