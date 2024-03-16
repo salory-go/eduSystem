@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from pojo.dto import CourseDTO
-from pojo.entity import User, Course
+from pojo.entity import User, Course, Question, Student_Course, Chapter, Assignment, Student_Assignment
 from pojo.vo import CourseVO
+from server.teacher.question import del_question
 from util.result import Result
 
 admin_course = APIRouter()
@@ -31,6 +32,23 @@ async def add_course(courseDTO: CourseDTO):
 
 @admin_course.delete("/course")
 async def del_course(courseId: int):
+    # course
     await Course.filter(id=courseId).delete()
-    # TODO 删除关联的所有..
+    await Student_Course.filter(courseId=courseId).delete()
+
+    # chapter
+    await Chapter.filter(courseId=courseId).delete()
+
+    # assignment
+    assignmentIds = await Assignment.filter(courseId=courseId).values_list('id', flat=True)
+    for aId in assignmentIds:
+        await Student_Assignment.filter(assignmentId=aId).delete()
+    await Assignment.filter(courseId=courseId).delete()
+
+    # question
+    questionIds = await Question.filter(courseId=courseId).values_list('id', flat=True)
+    for qId in questionIds:
+        await del_question(qId)
+    await Question.filter(courseId=courseId).delete()
+
     return Result.success()

@@ -21,6 +21,9 @@ async def add_user(userDTO: UserDTO):
 
 @admin_user.delete("/user")
 async def del_user(userId: int):
-    await User.filter(id=userId).delete()
+    user = await User.get(id=userId)
+    if user.role == 3:
+        await User.filter(id=userId).delete()
+    elif user.role == 2:
     # TODO 删除关联的所有..
     return Result.success()
