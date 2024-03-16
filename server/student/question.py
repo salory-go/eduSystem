@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 from pojo.dto import AnswerDTO
 from pojo.entity import Course, Question, Chapter, Student_Answer
-from pojo.vo import QuestionVO
+from pojo.vo import QuestionVO, ReferenceVO
 from util.result import Result
 
 student_practice = APIRouter()
@@ -48,6 +48,20 @@ async def submit_answer(answerDTO: AnswerDTO):
                                     studentAnswer=answerDTO.studentAnswer, score=score)
 
     return Result.success()
+
+
+@student_practice.get("/student/question/reference")
+async def get_reference(questionId: int):
+    question = await Question.get(id=questionId).values("courseId", "chapterId", "content", "answer")
+    course = await Course.get(id=question['courseId'])
+    chapter = await Chapter.get(id=question['chapterId'])
+    courseName = course.courseName
+    chapterName = chapter.chapterName
+    # TODO 用大模型生成解析
+    idea = ""
+    topic = ""
+    reference = ReferenceVO(idea=idea, tpoic=topic, answer=question['answer'])
+    return Result.success(reference)
 
 
 @student_practice.get("/student/question/history")
