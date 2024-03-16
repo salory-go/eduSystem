@@ -1,8 +1,5 @@
-from datetime import datetime
 from typing import Optional
-
 from fastapi import APIRouter
-
 from pojo.entity import Assignment, Assignment_Question, User, Question, Course, Chapter
 from pojo.dto import AssignmentDTO
 from pojo.vo import AssignmentVO
@@ -27,8 +24,8 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
         assignmentVO = AssignmentVO(id=a['id'], title=a['title'], deadline=a['title'], overdue=a['overdue'],
                                     creatTime=a['createTime'])
 
-        course = await Course.get(id=a['courseId']).values('id')
-        assignmentVO.id = course['id']
+        course = await Course.get(id=a['courseId']).values('courseName')
+        assignmentVO.courseName = course['courseName']
         assignmentList.append(assignmentVO)
 
     return Result.success(assignmentList)
