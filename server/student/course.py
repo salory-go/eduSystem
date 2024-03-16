@@ -1,40 +1,39 @@
 from fastapi import APIRouter
-from pojo.entity import Course, Assignment, Student_Course
-from pojo.vo import AssignmentsOfCourseVO, CourseVO
+from pojo.entity import Course, Student_Course, User
+from pojo.vo import CourseVO
 from util.result import Result
+from tortoise.exceptions import DoesNotExist
 
 student_course = APIRouter()
 
 
 @student_course.get("/student/course")
 async def get_courses():
-    courses = await Course.all().values("id","image","courseName","teacherName","createTime")
-    return Result.success(courses)
+    courseList = await Course.all().values("id", "image", "courseName", "teacherName", "createTime")
+    return Result.success(courseList)
+
 
 @student_course.get("/student/course")
 async def get_my_courses(user_id: int):
-    courses = await Student_Course.filter(userId=user_id).values("id","image","courseName","teacherName","createTime")
-    return Result.success(courses)
+    courses = await Student_Course.filter(userId=user_id).values('courseId', 'joinTime')
+    courseList = []
+    for c in courses:
+        course = await Course.get(id=c['courseId']).values('id', 'image', 'courseName', 'userId')
+        user = await User.get(id=c['userId']).values('name')
+        courseVO = CourseVO(id=c['courseId'], image=c['image'], courseName=c['courseName'], teacherName=user['name'],
+                            joinTime=c['joinTime'])
+        courseList.append(courseVO)
 
-# @student_course.get("/student/course/{courseId}")
-# async def get_course_info(courseId: int):
-#     # 获取课程对象
-#     course = await Course.get(id=courseId).values()
-#     # 获取课程对应的作业对象
-#     lists = await Assignment.filter(courseId=courseId).values()
-#     for item in lists:
-#         item.pop("courseId")
-#     # 封装成VO
-#     assignments = AssignmentsOfCourseVO(**lists)
-#     courseVO = CourseVO(courseName=course.courseName,assignments=assignments)
-#     return Result.success()
+    return Result.success(courseList)
 
 
 @student_course.post("/student/Course")
-async def add_course(userId: int,courseId: int):
-    #检验是否有该课程
-    list = await Student_Course.filter(userId=userId,courseId=courseId).values()
-    if list:
-        await Student_Course.save(userId=userId,courseId=courseId)
+async def add_course(userId: int, courseId: int):
+    # 检验是否有该课程
+    try:
+        await Student_Course.get(userId=userId, courseId=courseId)
+        # TODO 返回400状态码
+        return Result.error('已在该课程中！')
+    except DoesNotExist:
+        await Student_Course.create(userId=userId, courseId=courseId)
         return Result.success()
-    return Result.error()

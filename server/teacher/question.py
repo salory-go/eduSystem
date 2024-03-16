@@ -16,27 +16,26 @@ async def get_questions(userId: int,
                         courseId: Optional[int] = None,
                         chapterId: Optional[int] = None,
                         difficulty: Optional[int] = None):
-    filters = {
+    query = {
         'userId': userId,
         'courseId': courseId,
         'chapterId': chapterId,
         'difficulty': difficulty
     }
-    # 移除值为 None 的键
-    filters = {k: v for k, v in filters.items() if v is not None}
+    query = {k: v for k, v in query.items() if v is not None}
 
-    questions = await Question.filter(**filters).values('id', 'content', 'answer', 'courseId', 'chapterId',
-                                                        'difficulty', 'createTime')
+    questions = await Question.filter(**query).values('id', 'content', 'answer', 'courseId', 'chapterId',
+                                                      'difficulty', 'createTime')
     questionList = []
     for q in questions:
         questionVO = QuestionVO(id=q['id'], content=q['content'], answer=q['answer'], difficulty=q['difficulty'],
                                 createTime=q['createTime'])
 
-        course = await Course.get(id=q['courseId'])
-        questionVO.courseName = course.id
+        course = await Course.get(id=q['courseId']).values('courseName')
+        questionVO.courseName = course['courseName']
 
-        chapter = await Chapter.get(id=q['chapterId'])
-        questionVO.courseName = chapter.id
+        chapter = await Chapter.get(id=q['chapterId']).values('chapterName')
+        questionVO.chapterName = chapter['chapterName']
 
         questionList.append(questionVO)
 
@@ -45,7 +44,7 @@ async def get_questions(userId: int,
 
 @teacher_question.post("/teacher/question/new")
 async def new_questions(questionDTO: QuestionDTO):
-    query = questionDTO.model_dump(exclude_unset=True)
+    question_data = questionDTO.model_dump(exclude_unset=True)
 
     # TODO 使用模型生成新题目
     questions = [{}, {}, {}]
@@ -60,14 +59,13 @@ async def add_questions(questionList: QuestionListDTO):
 
     for q in questions:
         q = q.model_dump(exclude_unset=True)
-        question = Question(userId=userId, content=q['content'], answer=q['answer'], difficulty=q['difficulty'],
-                            createTime=datetime.now(), updateTime=datetime.now())
+        question = Question(userId=userId, content=q['content'], answer=q['answer'], difficulty=q['difficulty'])
 
-        course = await Course.get(courseName=q['courseName'])
-        question.courseId = course.id
+        course = await Course.get(courseName=q['courseName']).values('id')
+        question.courseId = course['id']
 
-        chapter = await Chapter.get(chapterName=q['chapterName'])
-        question.chapterId = chapter.id
+        chapter = await Chapter.get(chapterName=q['chapterName']).values('id')
+        question.chapterId = chapter['id']
 
         await question.save()
     return Result.success()
