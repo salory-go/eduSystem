@@ -5,13 +5,13 @@ from tortoise import fields
 class User(Model):
     id = fields.IntField(pk=True)
     userNumber = fields.CharField(max_length=32, description="学工号", unique=True)
-    password = fields.CharField(max_length=32, description="密码")
+    password = fields.CharField(max_length=32, description="密码", default="123456")
     email = fields.CharField(max_length=32, description="电子邮箱", unique=True)
     name = fields.CharField(max_length=32, description="姓名")
     role = fields.IntField(description="角色(1.教师2.管理员3.学生)")
     personalization = fields.CharField(max_length=32, description="个性化内容")  # 格式待定
-    createTime = fields.DatetimeField(description="创建时间")
-    updateTime = fields.DatetimeField(description="更新时间")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+    updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
 
 class Course(Model):
@@ -19,14 +19,15 @@ class Course(Model):
     image = fields.CharField(max_length=32, description="课程头像")
     courseName = fields.CharField(max_length=32, description="课程名称", unique=True)
     userId = fields.IntField(description="教师ID")
-    createTime = fields.DatetimeField(description="创建时间")
-    updateTime = fields.DatetimeField(description="更新时间")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+    updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
 
 class Student_Course(Model):
     id = fields.IntField(pk=True)
     userId = fields.IntField(description="学生ID")
     courseId = fields.IntField(description="课程ID")
+    joinTime = fields.DatetimeField(description="加入时间", auto_now_add=True)
 
 
 class Question(Model):
@@ -37,16 +38,16 @@ class Question(Model):
     content = fields.TextField(max_length=500, description="题目内容")
     answer = fields.TextField(max_length=500, description="题目答案")
     difficulty = fields.IntField(description="题目难度(1.简单2.中等3.困难")
-    createTime = fields.DatetimeField(description="创建时间")
-    updateTime = fields.DatetimeField(description="更新时间")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+    updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
 
 class Chapter(Model):
     id = fields.IntField(pk=True)
-    chapterName = fields.CharField(max_length=32, description="章节名称")
+    chapterName = fields.CharField(max_length=32, description="章节名称", unique=True)
     courseId = fields.IntField(description="课程ID")
-    createTime = fields.DatetimeField(description="创建时间")
-    updateTime = fields.DatetimeField(description="更新时间")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+    updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
 
 class Assignment(Model):
@@ -55,10 +56,10 @@ class Assignment(Model):
     userId = fields.IntField(description="教师ID")
     title = fields.CharField(max_length=32, description="作业标题")
     deadline = fields.DatetimeField(description="截止时间")
-    overdue = fields.BooleanField(description="是否过期")
+    overdue = fields.BooleanField(description="是否过期", default=False)
     isPersonalized = fields.BooleanField(description="是否个性化")
-    createTime = fields.DatetimeField(description="创建时间")
-    updateTime = fields.DatetimeField(description="更新时间")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+    updateTime = fields.DatetimeField(description="更新时间,", auto_now=True)
 
 
 class Assignment_Question(Model):
@@ -74,7 +75,7 @@ class Student_Answer(Model):
     questionId = fields.IntField(description="题目ID")
     studentAnswer = fields.TextField(max_length=500, description="学生答案")
     score = fields.FloatField(description="学生答案分数")
-    submitTime = fields.DatetimeField(description="提交时间")
+    submitTime = fields.DatetimeField(description="提交时间", auto_now_add=True)
 
 
 class Student_Assignment(Model):
@@ -83,14 +84,14 @@ class Student_Assignment(Model):
     assignmentId = fields.IntField(description="作业ID")
     completed = fields.BooleanField(description="是否完成")
     score = fields.FloatField(description="成绩")
-    submitTime = fields.DatetimeField(description="提交时间")
+    submitTime = fields.DatetimeField(description="提交时间", auto_now_add=True)
 
 
 class Star(Model):
     id = fields.IntField(pk=True)
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
-    createTime = fields.DatetimeField(description="创建时间")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
 
 # class Exam(Model):
 #     id = fields.IntField(pk=True)
