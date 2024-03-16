@@ -32,6 +32,7 @@ class AssignmentDTO(BaseModel):
 
 
 class CourseDTO(BaseModel):
+    image: str
     courseName: str
     userId: int
 
