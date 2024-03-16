@@ -8,7 +8,7 @@ from util.result import Result
 teacher_assignment = APIRouter()
 
 
-@teacher_assignment.get("/teacher/assignment")
+@teacher_assignment.get("/assignment")
 async def get_assignments(userId: int, courseId: Optional[int] = None):
     query = {
         'userId': userId,
@@ -31,7 +31,7 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
     return Result.success(assignmentList)
 
 
-@teacher_assignment.post("/teacher/assignment")
+@teacher_assignment.post("/assignment")
 async def create_assignment(assignmentDTO: AssignmentDTO):
     assignment_data = assignmentDTO.model_dump(exclude_unset=True)
     if assignmentDTO.questionIds:
@@ -74,7 +74,7 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
     return Result.success()
 
 
-@teacher_assignment.delete("/teacher/assignment")
+@teacher_assignment.delete("/assignment")
 async def del_assignment(assignmentId: int):
     await Assignment.filter(id=assignmentId).delete()
     # TODO 删除关联的所有..

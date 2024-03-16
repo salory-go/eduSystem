@@ -9,7 +9,7 @@ from util.result import Result
 teacher_question = APIRouter()
 
 
-@teacher_question.get("/teacher/question/{userId}")
+@teacher_question.get("/question/{userId}")
 async def get_questions(userId: int,
                         courseId: Optional[int] = None,
                         chapterId: Optional[int] = None,
@@ -40,7 +40,7 @@ async def get_questions(userId: int,
     return Result.success(questionList)
 
 
-@teacher_question.post("/teacher/question/new")
+@teacher_question.post("/question/new")
 async def new_questions(questionDTO: QuestionDTO):
     question_data = questionDTO.model_dump(exclude_unset=True)
 
@@ -50,7 +50,7 @@ async def new_questions(questionDTO: QuestionDTO):
     return Result.success(questions)
 
 
-@teacher_question.post("/teacher/question")
+@teacher_question.post("/question")
 async def add_questions(questionList: QuestionListDTO):
     userId = questionList.userId
     questions = questionList.questions
@@ -69,7 +69,7 @@ async def add_questions(questionList: QuestionListDTO):
     return Result.success()
 
 
-@teacher_question.delete("/teacher/question")
+@teacher_question.delete("/question")
 async def del_question(questionId: int):
     await Question.filter(id=questionId).delete()
 
