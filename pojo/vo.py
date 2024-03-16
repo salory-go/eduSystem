@@ -36,3 +36,8 @@ class CourseVO(BaseModel):
     courseName: str
     teacherName: str
     joinTime: datetime
+
+class ReferenceVO(BaseModel):
+    idea: str
+    topic: str
+    answer: str
