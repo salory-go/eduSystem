@@ -4,27 +4,17 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class LoginDTO(BaseModel):
+class UserDTO(BaseModel):
     userNumber: str
     password: str
     role: int
-
-
-class UserDTO(BaseModel):
-    id: Optional[int] = None
-    userNumber: Optional[str] = None
-    password: Optional[str] = None
     name: Optional[str] = None
     email: Optional[str] = None
-    role: Optional[int] = None
 
 
 class QuestionDTO(BaseModel):
-    id: Optional[int] = None
     number: Optional[int] = None
-    courseId: Optional[int] = None
     courseName: Optional[str] = None
-    chapterId: Optional[int] = None
     chapterName: Optional[str] = None
     difficulty: Optional[int] = None
     topic: Optional[List[str]] = None
@@ -33,20 +23,17 @@ class QuestionDTO(BaseModel):
 
 
 class AssignmentDTO(BaseModel):
-    id: Optional[int] = None
-    courseId: Optional[int] = None
-    userId: Optional[int] = None
-    title: Optional[str] = None
-    isPersonalized: Optional[bool] = None
+    courseId: int
+    userId: int
+    title: str
+    isPersonalized: bool
     questionIds: Optional[List[int]] = None
-    deadline: Optional[datetime] = None
-    overdue: Optional[bool] = None
+    deadline: datetime
 
 
 class CourseDTO(BaseModel):
-    id: Optional[int] = None
-    courseName: Optional[str] = None
-    userId: Optional[int] = None
+    courseName: str
+    userId: int
 
 
 class QuestionListDTO(BaseModel):
@@ -55,11 +42,17 @@ class QuestionListDTO(BaseModel):
 
 
 class AnswerDTO(BaseModel):
+    userId: Optional[int] = None
     questionId: int
-    answer: str
+    studentAnswer: str
 
 
 class AnswerListDTO(BaseModel):
     assignmentId: int
     userId: int
     answers: List[AnswerDTO]
+
+
+class StarDTO(BaseModel):
+    userId: int
+    questionId: int
