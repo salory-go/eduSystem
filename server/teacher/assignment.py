@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter
-from pojo.entity import Assignment, Assignment_Question, User, Question, Course, Chapter
+from pojo.entity import Assignment, Assignment_Question, User, Question, Course, Chapter, Student_Assignment
 from pojo.dto import AssignmentDTO
 from pojo.vo import AssignmentVO
 from util.result import Result
@@ -77,5 +77,5 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
 @teacher_assignment.delete("/assignment")
 async def del_assignment(assignmentId: int):
     await Assignment.filter(id=assignmentId).delete()
-    # TODO 删除关联的所有..
+    await Student_Assignment.filter(assignmentId=assignmentId).delete()
     return Result.success()
