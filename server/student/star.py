@@ -1,16 +1,26 @@
-from fastapi import APIRouter
+import json
+from typing import Optional
+
+from fastapi import APIRouter, Response
+from fastapi.openapi.models import Response
 from tortoise.exceptions import DoesNotExist
 
 from pojo.entity import Course, Star, Question, Chapter
 from pojo.vo import QuestionVO
-from util.result import Result
+from pojo.result import Result
 
 student_star = APIRouter()
 
 
 @student_star.get("/star")
-async def get_stars(userId: int):
-    stars = await Star.filter(userId=userId).values('questionId', 'createTime')
+async def get_stars(userId: int, courseId: Optional[int] = None):
+    query = {
+        'userId': userId,
+        'courseId': courseId
+    }
+    query = {k: v for k, v in query.items() if v is not None}
+
+    stars = await Star.filter(**query).values('questionId', 'createTime')
 
     starList = []
     for s in stars:
@@ -29,8 +39,8 @@ async def get_stars(userId: int):
 async def add_star(userId: int, questionId: int):
     try:
         await Star.get(userId=userId, questionId=questionId)
-        # TODO 返回400状态码
-        return Result.error('已在收藏中！')
+        result = json.dumps(Result.error('已在收藏中！').model_dump())
+        return Response(status_code=400, media_type='application/json', content=result)
     except DoesNotExist:
         await Star.create(userId=userId, questionId=questionId)
         return Result.success()
