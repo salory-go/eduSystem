@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from pojo.entity import Course, Chapter, Student_Course, User
-from util.result import Result
+from pojo.result import Result
 
 teacher_course = APIRouter()
 

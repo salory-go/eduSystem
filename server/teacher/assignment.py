@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from pojo.entity import Assignment, Assignment_Question, User, Question, Course, Chapter, Student_Assignment
 from pojo.dto import AssignmentDTO
 from pojo.vo import AssignmentVO
-from util.result import Result
+from pojo.result import Result
 
 teacher_assignment = APIRouter()
 

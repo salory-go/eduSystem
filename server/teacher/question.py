@@ -1,10 +1,10 @@
 from fastapi import APIRouter
-from typing import Optional
+from typing import Optional, List
 
 from pojo.entity import Question, Course, Chapter, Star, Student_Answer
 from pojo.dto import QuestionDTO, QuestionListDTO
 from pojo.vo import QuestionVO
-from util.result import Result
+from pojo.result import Result
 
 teacher_question = APIRouter()
 
@@ -70,8 +70,8 @@ async def add_questions(questionList: QuestionListDTO):
 
 
 @teacher_question.delete("/question")
-async def del_question(questionId: int):
-    await Question.filter(id=questionId).delete()
-    await Star.filter(questionId=questionId).delete()
-    await Student_Answer.filter(questionId=questionId).delete()
+async def del_question(questionIds: List[int]):
+    await Question.filter(id__in=questionIds).delete()
+    await Star.filter(questionId_in=questionIds).delete()
+    await Student_Answer.filter(questionId__in=questionIds).delete()
     return Result.success()
