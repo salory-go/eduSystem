@@ -3,7 +3,7 @@ from pojo.dto import CourseDTO
 from pojo.entity import User, Course, Question, Student_Course, Chapter, Assignment, Student_Assignment
 from pojo.vo import CourseVO
 from server.teacher.question import del_question
-from util.result import Result
+from pojo.result import Result
 
 admin_course = APIRouter()
 
@@ -47,8 +47,7 @@ async def del_course(courseId: int):
 
     # question
     questionIds = await Question.filter(courseId=courseId).values_list('id', flat=True)
-    for qId in questionIds:
-        await del_question(qId)
+    await del_question(questionIds)
     await Question.filter(courseId=courseId).delete()
 
     return Result.success()
