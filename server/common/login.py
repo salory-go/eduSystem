@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+import json
+
+from fastapi import APIRouter, Response
 
 from pojo.dto import UserDTO
 from pojo.entity import User
 from pojo.vo import LoginVO
-from util.result import Result
+from pojo.result import Result
 from tortoise.exceptions import DoesNotExist
 
 login = APIRouter()
@@ -17,5 +19,5 @@ async def user_login(userDTO: UserDTO):
         token = '这是token'
         return Result.success(LoginVO(id=user.id, token=token))
     except DoesNotExist:
-        # TODO 返回400状态码
-        return Result.error("账号或密码错误！")
+        result = json.dumps(Result.error("账号或密码错误！").model_dump())
+        return Response(status_code=400, media_type="application/json", content=result)
