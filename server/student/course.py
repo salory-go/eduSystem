@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+import json
+
+from fastapi import APIRouter, Response
 from pojo.entity import Course, Student_Course, User
 from pojo.vo import CourseVO
-from util.result import Result
+from pojo.result import Result
 from tortoise.exceptions import DoesNotExist
 
 student_course = APIRouter()
@@ -32,8 +34,8 @@ async def add_course(userId: int, courseId: int):
     # 检验是否有该课程
     try:
         await Student_Course.get(userId=userId, courseId=courseId)
-        # TODO 返回400状态码
-        return Result.error('已在该课程中！')
+        result = json.dumps(Result.error('已在该课程中！').model_dump())
+        return Response(status_code=400, media_type='application/json', content=result)
     except DoesNotExist:
         await Student_Course.create(userId=userId, courseId=courseId)
         return Result.success()

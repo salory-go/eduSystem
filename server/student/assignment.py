@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from pojo.dto import AnswerListDTO
 from pojo.entity import Course, Assignment, Student_Assignment, Assignment_Question, Question, Student_Answer
 from pojo.vo import AssignmentVO
-from util.result import Result
+from pojo.result import Result
 
 student_assignment = APIRouter()
 
