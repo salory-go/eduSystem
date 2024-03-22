@@ -19,22 +19,21 @@ def print_with_typewriter_effect(text, delay=0.05):
 #         print_with_typewriter_effect(content)
 
 difficulty_map = {
-    1: "easy",
-    2: "medium",
-    3: "hard"
+    1: "简单",
+    2: "中等",
+    3: "困难"
 }
 
 
-def create(message: List[dict], top_p: float = 0.7, temperature: float = 0.9, max_tokens: int = 2000):
+def create(message: List[dict], top_p: float = 0.7, temperature: float = 0.5, max_tokens: int = 2000):
     res = client.chat.completions.create(
         model="glm-4",
         messages=message,
-        stream=True,
         top_p=top_p,
         temperature=temperature,
         max_tokens=max_tokens,
     )
-    return res
+    return res.choices[0].message.content
 
 
 def generate_ideas(content: str, courseName: str, chapterName: str):
@@ -46,7 +45,7 @@ def generate_ideas(content: str, courseName: str, chapterName: str):
         }
     ]
     res = create(messages)
-    print(res)
+    return res
 
 
 def generate_eval(content: str, studentAnswer: str, answer):
@@ -58,10 +57,10 @@ def generate_eval(content: str, studentAnswer: str, answer):
         }
     ]
     res = create(messages)
-    print(res)
+    return res
 
 
-def generate_question(courseName: str, chapterName: str, difficulty: int, number: int):
+def generate_question(number: int, courseName: str, chapterName: str, difficulty: int):
     messages = [
         {"role": "system", "content": "你是一名计算机专业的大学教授。"},
         {
@@ -70,10 +69,8 @@ def generate_question(courseName: str, chapterName: str, difficulty: int, number
         }
     ]
     res = create(messages)
-    if res:
-        for chunk in res:
-            content = chunk.choices[0].delta.content
-            print_with_typewriter_effect(content)
+    return res
 
 
-generate_question("计算机网络", "物理层", 2, 3)
+# generate_ideas("在数据链路层中，什么是帧？请简述帧的主要作用。", "计算机网络", "数据链路层")
+generate_question(2, "计算机网络", "数据链路层", 2)
