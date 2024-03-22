@@ -2,10 +2,9 @@ import json
 
 import uvicorn
 from fastapi import FastAPI, Request, Response
-from fastapi_cdn_host import monkey_patch_for_docs_ui
 from tortoise.contrib.fastapi import register_tortoise
 
-from config.dbConfig import TORTOISE_ORM
+from const.dbConfig import TORTOISE_ORM
 from server.admin.router import admin
 from server.common.router import common
 from server.student.router import student
@@ -24,8 +23,6 @@ app.include_router(common, tags=["普通接口"])
 app.include_router(admin, prefix='/admin', tags=["管理员接口"])
 app.include_router(teacher, prefix='/teacher', tags=["教师接口"])
 app.include_router(student, prefix='/student', tags=["学生接口"])
-
-monkey_patch_for_docs_ui(app)
 
 
 # @app.middleware("http")
