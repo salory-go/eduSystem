@@ -13,31 +13,31 @@ student_course = APIRouter()
 
 @student_course.get("/course")
 async def get_courses():
-    courseList = await Course.all()
-    result = []
-    for course in courseList:
-        teacher = await User.get(id=course.userId)
-        result.append(CourseVO(id=course.courseId, image=course.image, courseName=course.courseName,
-                            teacherName=teacher.name, createTime=parse(course.createTime)))
-    return Result.success(result)
+    courses = await Course.all().values("id", "image", "courseName", "userId", "createTime")
+    courseList = []
+    for c in courses:
+        user = await User.get(id=c['userId']).values('name')
+        courseVO = CourseVO(id=c['courseId'], image=c['image'], courseName=c['courseName'],
+                            teacherName=user['name'], createTime=parse(c['createTime']))
+        courseList.append(courseVO)
+    return Result.success(courseList)
 
 
-@student_course.get("/course")
-async def get_my_courses(user_id: int):
-    courses = await Student_Course.filter(userId=user_id).values('courseId', 'joinTime')
+@student_course.get("/course/{userId}")
+async def get_my_courses(userId: int):
+    courses = await Student_Course.filter(userId=userId).values('courseId', 'joinTime')
     courseList = []
     for c in courses:
         course = await Course.get(id=c['courseId']).values('id', 'image', 'courseName', 'userId')
         user = await User.get(id=c['userId']).values('name')
         courseVO = CourseVO(id=course['courseId'], image=course['image'], courseName=course['courseName'],
                             teacherName=user['name'], joinTime=parse(c['joinTime']))
-
         courseList.append(courseVO)
 
     return Result.success(courseList)
 
 
-@student_course.post("/Course")
+@student_course.post("/course")
 async def add_course(userId: int, courseId: int):
     # 检验是否有该课程
     try:
