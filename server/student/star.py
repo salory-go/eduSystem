@@ -1,6 +1,5 @@
 import json
 from typing import Optional
-
 from fastapi import APIRouter, Response
 from fastapi.openapi.models import Response
 from tortoise.exceptions import DoesNotExist
@@ -8,6 +7,7 @@ from tortoise.exceptions import DoesNotExist
 from pojo.entity import Course, Star, Question, Chapter
 from pojo.vo import QuestionVO
 from pojo.result import Result
+from util.dateParse import parse
 
 student_star = APIRouter()
 
@@ -29,7 +29,7 @@ async def get_stars(userId: int, courseId: Optional[int] = None):
         chapter = await Chapter.get(id=q["chapterId"]).values('chapterName')
 
         starVO = QuestionVO(id=q["id"], courseName=course["courseName"], chapterName=chapter["chapterName"],
-                            content=q["content"], difficulty=q["difficulty"], createTime=q["createTime"])
+                           content=q["content"], difficulty=q["difficulty"], createTime=parse(s['createTime']))
         starList.append(starVO)
 
     return Result.success(starList)

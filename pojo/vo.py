@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -16,7 +15,7 @@ class QuestionVO(BaseModel):
     difficulty: int
     content: str
     answer: str
-    createTime: datetime
+    createTime: int
 
 
 class AssignmentVO(BaseModel):
@@ -27,7 +26,7 @@ class AssignmentVO(BaseModel):
     overdue: bool
     completed: Optional[bool] = None
     score: Optional[int] = None
-    createTime: datetime
+    createTime: int
 
 
 class CourseVO(BaseModel):
@@ -35,11 +34,16 @@ class CourseVO(BaseModel):
     image: str
     courseName: str
     teacherName: str
-    joinTime: Optional[datetime] = None
-    createTime: Optional[datetime] = None
+    joinTime: Optional[int] = None
+    createTime: Optional[int] = None
 
 
 class ReferenceVO(BaseModel):
     idea: str
     topic: str
     answer: str
+
+class AnswerVO(BaseModel):
+    studentAnswer: str
+    score: Optional[int] = None
+    submitTime: Optional[int] = None

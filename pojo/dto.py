@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -15,8 +14,8 @@ class UserDTO(BaseModel):
 class QuestionDTO(BaseModel):
     number: Optional[int] = None
     courseName: Optional[str] = None
-    chapterName: Optional[str] = None
-    difficulty: Optional[int] = None
+    chapterName: Optional[str] = "综合练习"
+    difficulty: int = 2
     topic: Optional[List[str]] = None
     content: Optional[str] = None
     answer: Optional[str] = None
@@ -28,7 +27,7 @@ class AssignmentDTO(BaseModel):
     title: str
     isPersonalized: bool
     questionIds: Optional[List[int]] = None
-    deadline: datetime
+    deadline: int
 
 
 class CourseDTO(BaseModel):

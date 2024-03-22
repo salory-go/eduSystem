@@ -6,13 +6,20 @@ from pojo.vo import CourseVO
 from pojo.result import Result
 from tortoise.exceptions import DoesNotExist
 
+from util.dateParse import parse
+
 student_course = APIRouter()
 
 
 @student_course.get("/course")
 async def get_courses():
-    courseList = await Course.all().values("id", "image", "courseName", "teacherName", "createTime")
-    return Result.success(courseList)
+    courseList = await Course.all()
+    result = []
+    for course in courseList:
+        teacher = await User.get(id=course.userId)
+        result.append(CourseVO(id=course.courseId, image=course.image, courseName=course.courseName,
+                            teacherName=teacher.name, createTime=parse(course.createTime)))
+    return Result.success(result)
 
 
 @student_course.get("/course")
@@ -23,7 +30,8 @@ async def get_my_courses(user_id: int):
         course = await Course.get(id=c['courseId']).values('id', 'image', 'courseName', 'userId')
         user = await User.get(id=c['userId']).values('name')
         courseVO = CourseVO(id=course['courseId'], image=course['image'], courseName=course['courseName'],
-                            teacherName=user['name'], joinTime=c['joinTime'])
+                            teacherName=user['name'], joinTime=parse(c['joinTime']))
+
         courseList.append(courseVO)
 
     return Result.success(courseList)

@@ -6,9 +6,17 @@ from pojo.dto import AnswerListDTO
 from pojo.entity import Course, Assignment, Student_Assignment, Assignment_Question, Question, Student_Answer
 from pojo.vo import AssignmentVO
 from pojo.result import Result
+import os
+from zhipuai import ZhipuAI
+
+from util.dateParse import parse
+
+os.environ["ZHIPUAI_API_KEY"] = "your api key"
+client = ZhipuAI()
 
 student_assignment = APIRouter()
 
+#%%
 
 @student_assignment.get("/assignment")
 async def get_assignments(userId: int, courseId: Optional[int] = None):
@@ -26,11 +34,11 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
         assignmentVO = AssignmentVO(id=assignment.id,
                                     courseName=course['courseName'],
                                     title=assignment.title,
-                                    deadline=assignment.deadline,
+                                    deadline=parse(assignment.deadline),
                                     overdue=assignment.overdue,
                                     completed=a.completed,
                                     score=a.score,
-                                    createTime=assignment.createTime)
+                                    createTime=parse(assignment.createTime))
         assignmentList.append(assignmentVO)
 
     return Result.success(assignmentList)
@@ -58,7 +66,24 @@ async def submit_assignment(answerListDTO: AnswerListDTO):
     # 通过两个id来查询答案和学生表
     for answer in answerListDTO.answers:
         # TODO 打分
+        question = await Question.get(id=answer.questionId)
+        response = client.chat.completions.create(
+            model="glm-4",
+            messages=[
+                {
+                    "role": "user",
+                    "content": "请你作为一名大学计算机教授，给我的作业打分（100分制），下面是我的作业题目和答案：\n"
+                               "题目：{}\n答案：{}\n\n请打分，直接给出数字，不需要其他内容！".format(question.content, answer.studentAnswer)
+                }
+            ],
+            top_p=0.7,
+            temperature=0.9,
+            stream=False,
+            max_tokens=2000,
+        )
         score = 100
+        if response:
+            score = float(response)
         studentAnswer = await Student_Answer.filter(userId=answerListDTO.userId, questionId=answer.questionId).first()
 
         if studentAnswer:
