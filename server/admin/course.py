@@ -4,6 +4,7 @@ from pojo.entity import User, Course, Question, Student_Course, Chapter, Assignm
 from pojo.vo import CourseVO
 from server.teacher.question import del_question
 from pojo.result import Result
+from util.dateParse import parse
 
 admin_course = APIRouter()
 
@@ -18,7 +19,7 @@ async def get_courses():
                                    courseName=course['courseName'],
                                    image=course['image'],
                                    teacherName=user.name,
-                                   createTime=course['createTime']
+                                   createTime=parse(course['createTime'])
                                    ))
     return Result.success(courseList)
 
