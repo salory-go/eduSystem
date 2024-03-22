@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter
-from pojo.entity import Assignment, Assignment_Question, User, Question, Course, Chapter, Student_Assignment
+from pojo.entity import Assignment, Assignment_Question, User, Question, Course, Chapter, Student_Assignment, \
+    Student_Course
 from pojo.dto import AssignmentDTO
 from pojo.vo import AssignmentVO
 from pojo.result import Result
@@ -41,7 +42,8 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
     await assignment.save()
     assignmentId = assignment.id
 
-    users = await User.filter(role=2).values('id', 'personalization')
+    userIds = await Student_Course.filter(courseId=assignmentDTO.courseId).values_list('userId', flat=True)
+    users = await User.filter(id__in=userIds).values('id', 'personalization')
     # 是否个性化
     if assignmentDTO.isPersonalized:
         for user in users:
