@@ -1,7 +1,6 @@
 import json
-from typing import Optional
-from fastapi import APIRouter, Response
-from fastapi.openapi.models import Response
+from typing import Optional, List
+from fastapi import APIRouter, Response, Query
 from tortoise.exceptions import DoesNotExist
 
 from pojo.dto import StarDTO
@@ -24,7 +23,7 @@ async def get_stars(userId: int, courseId: Optional[int] = None):
                                                           "chapterId",
                                                           "content",
                                                           "difficulty")
-        if courseId and q['id'] != courseId:
+        if courseId and q['courseId'] != courseId:
             continue
 
         course = await Course.get(id=q["courseId"]).values('courseName')
@@ -52,6 +51,6 @@ async def add_star(starDTO: StarDTO):
 
 
 @student_star.delete("/star")
-async def del_star(starId: int):
-    await Star.filter(id=starId).delete()
+async def del_star(starIds: List[int] = Query(...)):
+    await Star.filter(id__in=starIds).delete()
     return Result.success()

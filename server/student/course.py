@@ -45,7 +45,7 @@ async def get_my_courses(userId: int):
                                    courseName=course['courseName'],
                                    teacherName=user['name'],
                                    joinTime=parse(c['joinTime']))
-                           .model_dump(exclude_unset=True))
+                          .model_dump(exclude_unset=True))
 
     return Result.success(courseList)
 
