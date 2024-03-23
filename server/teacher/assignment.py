@@ -5,6 +5,7 @@ from pojo.entity import Assignment, Assignment_Question, User, Question, Course,
 from pojo.dto import AssignmentDTO
 from pojo.vo import AssignmentVO
 from pojo.result import Result
+from util.dateParse import parse
 
 teacher_assignment = APIRouter()
 
@@ -31,9 +32,9 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
         assignmentList.append(AssignmentVO(id=a['id'],
                                            courseName=course['courseName'],
                                            title=a['title'],
-                                           deadline=a['title'],
+                                           deadline=parse(a['deadline']),
                                            overdue=a['overdue'],
-                                           creatTime=a['createTime']))
+                                           createTime=parse(a['createTime'])).model_dump(exclude_unset=True))
 
     return Result.success(assignmentList)
 
@@ -47,10 +48,15 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
     assignment = Assignment(**assignment_data)
     await assignment.save()
     assignmentId = assignment.id
-
     userIds = await (Student_Course.filter(courseId=assignmentDTO.courseId)
                      .values_list('userId', flat=True))
+    assignmentList = []
+    for id in userIds:
+        assignmentList.append(Student_Assignment(assignmentId=assignmentId, userId=id))
+
+    await Student_Assignment.bulk_create(assignmentList)
     users = await (User.filter(id__in=userIds).values('id', 'personalization'))
+
     # 是否个性化
     if assignmentDTO.isPersonalized:
         for user in users:

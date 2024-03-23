@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from util.dateParse import parse
+
+from fastapi import APIRouter, Query
 from typing import Optional, List
 
 from pojo.entity import Question, Course, Chapter, Star, Student_Answer
@@ -41,7 +43,7 @@ async def get_questions(userId: int,
                                        content=q['content'],
                                        answer=q['answer'],
                                        difficulty=q['difficulty'],
-                                       createTime=q['createTime']))
+                                       createTime=parse(q['createTime'])))
 
     return Result.success(questionList)
 
@@ -59,7 +61,7 @@ async def new_questions(questionDTO: QuestionDTO):
         questionList.append(QuestionVO(courseName=questionDTO.courseName,
                                        chapterName=questionDTO.chapterName,
                                        difficulty=questionDTO.difficulty,
-                                       **q))
+                                       **q).model_dump(exclude_unset=True))
     return Result.success(questionList)
 
 
@@ -83,8 +85,8 @@ async def add_questions(questionList: QuestionListDTO):
 
 
 @teacher_question.delete("/question")
-async def del_question(questionIds: List[int]):
+async def del_question(questionIds: List[int] = Query(...) ):
     await Question.filter(id__in=questionIds).delete()
-    await Star.filter(questionId_in=questionIds).delete()
+    await Star.filter(questionId__in=questionIds).delete()
     await Student_Answer.filter(questionId__in=questionIds).delete()
     return Result.success()
