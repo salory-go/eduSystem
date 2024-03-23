@@ -23,20 +23,25 @@ async def get_questions(userId: int,
     }
     query = {k: v for k, v in query.items() if v is not None}
 
-    questions = await Question.filter(**query).values('id', 'content', 'answer', 'courseId', 'chapterId',
-                                                      'difficulty', 'createTime')
+    questions = await Question.filter(**query).values('id',
+                                                      'content',
+                                                      'answer',
+                                                      'courseId',
+                                                      'chapterId',
+                                                      'difficulty',
+                                                      'createTime')
     questionList = []
     for q in questions:
-        questionVO = QuestionVO(id=q['id'], content=q['content'], answer=q['answer'], difficulty=q['difficulty'],
-                                createTime=q['createTime'])
-
         course = await Course.get(id=q['courseId']).values('courseName')
-        questionVO.courseName = course['courseName']
-
         chapter = await Chapter.get(id=q['chapterId']).values('chapterName')
-        questionVO.chapterName = chapter['chapterName']
 
-        questionList.append(questionVO)
+        questionList.append(QuestionVO(id=q['id'],
+                                       courseName=course['courseName'],
+                                       chapterName=chapter['chapterName'],
+                                       content=q['content'],
+                                       answer=q['answer'],
+                                       difficulty=q['difficulty'],
+                                       createTime=q['createTime']))
 
     return Result.success(questionList)
 
@@ -44,7 +49,10 @@ async def get_questions(userId: int,
 @teacher_question.post("/question/new")
 async def new_questions(questionDTO: QuestionDTO):
     # 使用模型生成新题目
-    res = generate_question(questionDTO.number, questionDTO.courseName, questionDTO.chapterName, questionDTO.difficulty)
+    res = generate_question(questionDTO.number,
+                            questionDTO.courseName,
+                            questionDTO.chapterName,
+                            questionDTO.difficulty)
 
     questionList = []
     for q in res:
@@ -61,15 +69,15 @@ async def add_questions(questionList: QuestionListDTO):
     questions = questionList.questions
 
     for q in questions:
-        q = q.model_dump(exclude_unset=True)
-        question = Question(userId=userId, content=q['content'], answer=q['answer'], difficulty=q['difficulty'])
+        course = await Course.get(courseName=q.courseName).values('id')
+        chapter = await Chapter.get(chapterName=q.chapterName).values('id')
 
-        course = await Course.get(courseName=q['courseName']).values('id')
-        question.courseId = course['id']
-
-        chapter = await Chapter.get(chapterName=q['chapterName']).values('id')
-        question.chapterId = chapter['id']
-
+        question = Question(userId=userId,
+                            courseId=course['id'],
+                            chapterId=chapter['id'],
+                            content=q.content,
+                            answer=q.answer,
+                            difficulty=q.difficulty)
         await question.save()
     return Result.success()
 

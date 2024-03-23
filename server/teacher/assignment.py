@@ -17,17 +17,23 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
     }
     query = {k: v for k, v in query.items() if v is not None}
 
-    assignments = await Assignment.filter(**query).values('id', 'courseId', 'title', 'deadline', 'overdue',
+    assignments = await Assignment.filter(**query).values('id',
+                                                          'courseId',
+                                                          'title',
+                                                          'deadline',
+                                                          'overdue',
                                                           'createTime')
 
     assignmentList = []
     for a in assignments:
-        assignmentVO = AssignmentVO(id=a['id'], title=a['title'], deadline=a['title'], overdue=a['overdue'],
-                                    creatTime=a['createTime'])
-
         course = await Course.get(id=a['courseId']).values('courseName')
-        assignmentVO.courseName = course['courseName']
-        assignmentList.append(assignmentVO)
+
+        assignmentList.append(AssignmentVO(id=a['id'],
+                                           courseName=course['courseName'],
+                                           title=a['title'],
+                                           deadline=a['title'],
+                                           overdue=a['overdue'],
+                                           creatTime=a['createTime']))
 
     return Result.success(assignmentList)
 
@@ -42,8 +48,9 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
     await assignment.save()
     assignmentId = assignment.id
 
-    userIds = await Student_Course.filter(courseId=assignmentDTO.courseId).values_list('userId', flat=True)
-    users = await User.filter(id__in=userIds).values('id', 'personalization')
+    userIds = await (Student_Course.filter(courseId=assignmentDTO.courseId)
+                     .values_list('userId', flat=True))
+    users = await (User.filter(id__in=userIds).values('id', 'personalization'))
     # 是否个性化
     if assignmentDTO.isPersonalized:
         for user in users:
@@ -60,17 +67,21 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
                 course = await Course.get(courseName=question['courseName']).values('id')
                 chapter = await Chapter.get(chapterName=question['chapterName']).values('id')
 
-                question = Question(**question, courseId=course['id'], chapterId=chapter['id'],
+                question = Question(**question,
+                                    courseId=course['id'],
+                                    chapterId=chapter['id'],
                                     userId=assignmentDTO.userId)
                 await question.save()
                 questionIds.append(question.id)
 
-            await Assignment_Question.create(assignmentId=assignmentId, userId=user['id'],
+            await Assignment_Question.create(assignmentId=assignmentId,
+                                             userId=user['id'],
                                              questionIds=str(questionIds))
 
     else:
         for user in users:
-            await Assignment_Question.create(assignmentId=assignmentId, userId=user['id'],
+            await Assignment_Question.create(assignmentId=assignmentId,
+                                             userId=user['id'],
                                              questionIds=str(assignmentDTO.questionIds))
 
     return Result.success()
