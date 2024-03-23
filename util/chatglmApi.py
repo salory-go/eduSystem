@@ -57,7 +57,7 @@ def generate_eval(content: str,
             "content": eval_msg % (content, studentAnswer, answer)
         }
     ]
-    return create(messages)
+    return float(create(messages))
 
 
 def generate_question(number: int,
