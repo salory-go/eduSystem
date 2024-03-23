@@ -23,14 +23,26 @@ async def get_courses():
                                    courseName=course['courseName'],
                                    image=course['image'],
                                    teacherName=user.name,
-                                   createTime=parse(course['createTime'])))
+                                   createTime=parse(course['createTime']))
+                          .model_dump(exclude_unset=True))
     return Result.success(courseList)
 
 
 @admin_course.post("/course")
 async def add_course(courseDTO: CourseDTO):
-    course_data = courseDTO.model_dump()
-    await Course.create(**course_data)
+    course = Course(image=courseDTO.image,
+                    courseName=courseDTO.courseName,
+                    userId=courseDTO.userId)
+
+    await course.save()
+    courseId = course.id
+
+    chapterList = []
+    for c in courseDTO.chapters:
+        chapterList.append(Chapter(chapterName=c,
+                                   courseId=courseId))
+
+    await Chapter.bulk_create(chapterList)
     return Result.success()
 
 
