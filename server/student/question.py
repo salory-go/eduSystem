@@ -62,9 +62,9 @@ async def get_reference(questionId: int):
     chapter = await Chapter.get(id=question['chapterId']).values('chapterName')
 
     # 用大模型生成解析
-    refer = generate_refer(question['content'], course['courseName'], chapter['chapterName'])
+    res = generate_refer(question['content'], course['courseName'], chapter['chapterName'])
 
-    reference = ReferenceVO(**refer, answer=question['answer'])
+    reference = ReferenceVO(**res, answer=question['answer'])
     return Result.success(reference)
 
 
