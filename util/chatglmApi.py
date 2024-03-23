@@ -20,7 +20,10 @@ def print_with_typewriter_effect(text, delay=0.05):
 #         print_with_typewriter_effect(content)
 
 
-def create(message: List[dict], top_p: float = 0.7, temperature: float = 0.9, max_tokens: int = 2000):
+def create(message: List[dict],
+           top_p: float = 0.7,
+           temperature: float = 0.9,
+           max_tokens: int = 2000):
     res = client.chat.completions.create(
         model="glm-4",
         messages=message,
@@ -31,7 +34,9 @@ def create(message: List[dict], top_p: float = 0.7, temperature: float = 0.9, ma
     return res.choices[0].message.content
 
 
-def generate_refer(content: str, courseName: str, chapterName: str):
+def generate_refer(content: str,
+                   courseName: str,
+                   chapterName: str):
     messages = [
         {"role": "system", "content": "你是一名计算机专业的大学教授。"},
         {
@@ -42,7 +47,9 @@ def generate_refer(content: str, courseName: str, chapterName: str):
     return process(create(messages))
 
 
-def generate_eval(content: str, studentAnswer: str, answer: str):
+def generate_eval(content: str,
+                  studentAnswer: str,
+                  answer: str):
     messages = [
         {"role": "system", "content": "你是一名计算机专业的大学教授。"},
         {
@@ -53,7 +60,10 @@ def generate_eval(content: str, studentAnswer: str, answer: str):
     return create(messages)
 
 
-def generate_question(number: int, courseName: str, chapterName: str, difficulty: int):
+def generate_question(number: int,
+                      courseName: str,
+                      chapterName: str,
+                      difficulty: int):
     messages = [
         {"role": "system", "content": "你是一名计算机专业的大学教授。"},
         {
