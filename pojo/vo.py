@@ -14,7 +14,7 @@ class QuestionVO(BaseModel):
     chapterName: str
     difficulty: int
     content: str
-    answer: str
+    answer: Optional[str] = None
     createTime: Optional[int] = None
 
 
@@ -22,7 +22,7 @@ class AssignmentVO(BaseModel):
     id: int
     courseName: str
     title: str
-    deadline: str
+    deadline: int
     overdue: bool
     completed: Optional[bool] = None
     score: Optional[int] = None
