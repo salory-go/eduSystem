@@ -74,7 +74,7 @@ class Student_Answer(Model):
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
     studentAnswer = fields.TextField(max_length=500, description="学生答案")
-    score = fields.FloatField(description="学生答案分数")
+    score = fields.FloatField(description="学生答案分数", default=0)
     submitTime = fields.DatetimeField(description="提交时间", auto_now_add=True)
 
 
@@ -82,7 +82,7 @@ class Student_Assignment(Model):
     id = fields.IntField(pk=True)
     userId = fields.IntField(description="学生ID")
     assignmentId = fields.IntField(description="作业ID")
-    completed = fields.BooleanField(description="是否完成")
+    completed = fields.BooleanField(description="是否完成", default=False)
     score = fields.FloatField(description="成绩", default=0)
 
 
