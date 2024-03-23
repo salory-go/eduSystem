@@ -83,8 +83,7 @@ class Student_Assignment(Model):
     userId = fields.IntField(description="学生ID")
     assignmentId = fields.IntField(description="作业ID")
     completed = fields.BooleanField(description="是否完成")
-    score = fields.FloatField(description="成绩")
-    submitTime = fields.DatetimeField(description="提交时间", auto_now_add=True)
+    score = fields.FloatField(description="成绩", default=0)
 
 
 class Star(Model):
