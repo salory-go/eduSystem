@@ -1,5 +1,5 @@
 from typing import Union
-import datetime
+from datetime import datetime
 from dateutil import parser
 
 
