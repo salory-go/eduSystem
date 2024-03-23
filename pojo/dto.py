@@ -34,6 +34,7 @@ class CourseDTO(BaseModel):
     image: str
     courseName: str
     userId: int
+    chapters: List[str]
 
 
 class QuestionListDTO(BaseModel):
