@@ -7,6 +7,7 @@ from pojo.dto import AnswerDTO
 from pojo.entity import Course, Question, Chapter, Student_Answer
 from pojo.vo import QuestionVO, ReferenceVO, AnswerVO
 from pojo.result import Result
+from util.chatglmApi import generate_eval, generate_refer
 from util.dateParse import parse
 
 student_question = APIRouter()
@@ -38,10 +39,11 @@ async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int
 
 @student_question.post("/question")
 async def submit_answer(answerDTO: AnswerDTO):
-    # TODO 打分
-    score = 100
+    # 打分
+    q = await Question.get(id=answerDTO.questionId).values('content', 'answer')
+    score = generate_eval(q['content'], answerDTO.studentAnswer, q['answer'])
+
     studentAnswer = await Student_Answer.filter(userId=answerDTO.userId, questionId=answerDTO.questionId).first()
-    question = await Question.filter(id=answerDTO.questionId).first()
 
     if studentAnswer:
         await Student_Answer.filter(userId=answerDTO.userId, questionId=answerDTO.questionId).update(
@@ -56,21 +58,21 @@ async def submit_answer(answerDTO: AnswerDTO):
 @student_question.get("/question/reference")
 async def get_reference(questionId: int):
     question = await Question.get(id=questionId).values("courseId", "chapterId", "content", "answer")
-    course = await Course.get(id=question['courseId'])
-    chapter = await Chapter.get(id=question['chapterId'])
-    courseName = course.courseName
-    chapterName = chapter.chapterName
-    # TODO 用大模型生成解析
-    idea = ""
-    topic = ""
-    reference = ReferenceVO(idea=idea, tpoic=topic, answer=question['answer'])
+    course = await Course.get(id=question['courseId']).values('courseName')
+    chapter = await Chapter.get(id=question['chapterId']).values('chapterName')
+
+    # 用大模型生成解析
+    refer = generate_refer(question['content'], course['courseName'], chapter['chapterName'])
+
+    reference = ReferenceVO(**refer, answer=question['answer'])
     return Result.success(reference)
 
 
 @student_question.get("/question/history")
 async def get_history_answer(userId: int, questionId: int):
     studentAnswer = await Student_Answer.filter(userId=userId, questionId=questionId).first()
-    answerVO = AnswerVO(studentAnswer=studentAnswer.studentAnswer,score=studentAnswer.score,submitTime=studentAnswer.submitTime)
+    answerVO = AnswerVO(studentAnswer=studentAnswer.studentAnswer, score=studentAnswer.score,
+                        submitTime=studentAnswer.submitTime)
     if studentAnswer:
         return Result.success(answerVO)
     else:

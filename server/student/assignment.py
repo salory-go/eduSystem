@@ -6,6 +6,7 @@ from pojo.dto import AnswerListDTO
 from pojo.entity import Course, Assignment, Student_Assignment, Assignment_Question, Question, Student_Answer
 from pojo.vo import AssignmentVO
 from pojo.result import Result
+from util.chatglmApi import generate_eval
 from util.dateParse import parse
 
 student_assignment = APIRouter()
@@ -57,20 +58,25 @@ async def get_assignment_detail(userId: int, assignmentId: int):
 @student_assignment.post("/assignment")
 async def submit_assignment(answerListDTO: AnswerListDTO):
     # 通过两个id来查询答案和学生表
-    for answer in answerListDTO.answers:
-        # TODO 打分
-        score = 100
-        studentAnswer = await Student_Answer.filter(userId=answerListDTO.userId, questionId=answer.questionId).first()
+    num = len(answerListDTO.answers)
+    weighted_score = 0.0
+
+    for sAnswer in answerListDTO.answers:
+        # 打分
+        q = await Question.get(id=sAnswer.questionId).values('content', 'answer')
+        score = generate_eval(q['content'], sAnswer.studentAnswer, q['answer'])
+        weighted_score += score / num
+        studentAnswer = await Student_Answer.filter(userId=answerListDTO.userId, questionId=sAnswer.questionId).first()
 
         if studentAnswer:
-            await Student_Answer.filter(userId=answerListDTO.userId, questionId=answer.questionId).update(
-                studentAnswer=answer.studentAnswer, score=score)
+            await Student_Answer.filter(userId=answerListDTO.userId, questionId=sAnswer.questionId).update(
+                studentAnswer=sAnswer.studentAnswer, score=score)
         else:
-            await Student_Answer.create(userId=answerListDTO.userId, questionId=answer.questionId,
-                                        studentAnswer=answer.studentAnswer, score=score)
-    # TODO 加权评分
-    score = 100
+            await Student_Answer.create(userId=answerListDTO.userId, questionId=sAnswer.questionId,
+                                        studentAnswer=sAnswer.studentAnswer, score=score)
+
+    # 加权评分
     await Student_Assignment.filter(userId=answerListDTO.userId, assignmentId=answerListDTO.assignmentId).update(
-        completed=True, score=score)
+        completed=True, score=weighted_score)
 
     return Result.success()
