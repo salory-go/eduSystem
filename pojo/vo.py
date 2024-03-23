@@ -9,13 +9,13 @@ class LoginVO(BaseModel):
 
 
 class QuestionVO(BaseModel):
-    id: int
+    id: Optional[int]
     courseName: str
     chapterName: str
     difficulty: int
     content: str
     answer: str
-    createTime: int
+    createTime: Optional[int]
 
 
 class AssignmentVO(BaseModel):
