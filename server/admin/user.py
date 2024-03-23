@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import List
+
+from fastapi import APIRouter, Query
 from pojo.dto import UserDTO
 from pojo.entity import User
 from pojo.result import Result
@@ -23,7 +25,7 @@ async def add_user(userDTO: UserDTO):
 
 
 @admin_user.delete("/user")
-async def del_user(userId: int):
-    await User.filter(id=userId).delete()
+async def del_user(userIds: List[int] = Query(...)):
+    await User.filter(id__in=userIds).delete()
     # TODO 删除关联的所有..
     return Result.success()
