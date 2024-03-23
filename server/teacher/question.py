@@ -85,7 +85,7 @@ async def add_questions(questionList: QuestionListDTO):
 
 
 @teacher_question.delete("/question")
-async def del_question(questionIds: List[int] = Query(...) ):
+async def del_question(questionIds: List[int] = Query(...)):
     await Question.filter(id__in=questionIds).delete()
     await Star.filter(questionId__in=questionIds).delete()
     await Student_Answer.filter(questionId__in=questionIds).delete()
