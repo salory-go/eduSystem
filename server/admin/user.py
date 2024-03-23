@@ -8,7 +8,10 @@ admin_user = APIRouter()
 
 @admin_user.get("/user")
 async def get_users(role: int):
-    users = await User.filter(role=role).values("id", "userNumber", "name", "email")
+    users = await User.filter(role=role).values("id",
+                                                "userNumber",
+                                                "name",
+                                                "email")
     return Result.success(users)
 
 

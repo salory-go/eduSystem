@@ -11,7 +11,11 @@ admin_course = APIRouter()
 
 @admin_course.get("/course")
 async def get_courses():
-    courses = await Course.all().values("id", "image", "courseName", "userId", "createTime")
+    courses = await Course.all().values("id",
+                                        "image",
+                                        "courseName",
+                                        "userId",
+                                        "createTime")
     courseList = []
     for course in courses:
         user = await User.get(id=course['userId'])
@@ -19,8 +23,7 @@ async def get_courses():
                                    courseName=course['courseName'],
                                    image=course['image'],
                                    teacherName=user.name,
-                                   createTime=parse(course['createTime'])
-                                   ))
+                                   createTime=parse(course['createTime'])))
     return Result.success(courseList)
 
 
