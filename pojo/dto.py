@@ -14,7 +14,7 @@ class UserDTO(BaseModel):
 class QuestionDTO(BaseModel):
     number: Optional[int] = None
     courseName: Optional[str] = None
-    chapterName: Optional[str] = "综合练习"
+    chapterName: str = "综合练习"
     difficulty: int = 2
     topic: Optional[List[str]] = None
     content: Optional[str] = None
