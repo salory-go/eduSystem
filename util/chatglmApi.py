@@ -2,7 +2,8 @@ import time
 from typing import List
 from zhipuai import ZhipuAI
 
-from const.msg import reference_msg, eval_msg, question_msg, diff_map
+from const.msg import refer_msg, eval_msg, question_msg, diff_map
+from util.textProcess import process
 
 client = ZhipuAI(api_key="7b1516a49710d181bb671927898a14b4.OCE2vCoySXStxYzx")
 
@@ -30,15 +31,15 @@ def create(message: List[dict], top_p: float = 0.7, temperature: float = 0.9, ma
     return res.choices[0].message.content
 
 
-def generate_ideas(content: str, courseName: str, chapterName: str):
+def generate_refer(content: str, courseName: str, chapterName: str):
     messages = [
         {"role": "system", "content": "你是一名计算机专业的大学教授。"},
         {
             "role": "user",
-            "content": reference_msg % (content, courseName, chapterName)
+            "content": refer_msg % (content, courseName, chapterName)
         }
     ]
-    return create(messages)
+    return process(create(messages))
 
 
 def generate_eval(content: str, studentAnswer: str, answer: str):
@@ -60,4 +61,6 @@ def generate_question(number: int, courseName: str, chapterName: str, difficulty
             "content": question_msg % (number, courseName, chapterName, diff_map[difficulty])
         }
     ]
-    return create(messages)
+    return process(create(messages))
+
+# print_with_typewriter_effect(generate_ideas("在数据链路层中，什么是帧？请简述帧的主要作用。", "计算机网络", "数据链路层"))
