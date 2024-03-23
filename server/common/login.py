@@ -14,7 +14,9 @@ login = APIRouter()
 @login.post("/login")
 async def user_login(userDTO: UserDTO):
     try:
-        user = await User.get(userNumber=userDTO.userNumber, password=userDTO.password, role=userDTO.role)
+        user = await User.get(userNumber=userDTO.userNumber,
+                              password=userDTO.password,
+                              role=userDTO.role)
         # TODO JWT Token生成
         token = '这是token'
         return Result.success(LoginVO(id=user.id, token=token))
