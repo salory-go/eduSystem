@@ -5,6 +5,7 @@ from pojo.entity import Question, Course, Chapter, Star, Student_Answer
 from pojo.dto import QuestionDTO, QuestionListDTO
 from pojo.vo import QuestionVO
 from pojo.result import Result
+from util.chatglmApi import generate_question
 
 teacher_question = APIRouter()
 
@@ -42,12 +43,16 @@ async def get_questions(userId: int,
 
 @teacher_question.post("/question/new")
 async def new_questions(questionDTO: QuestionDTO):
-    question_data = questionDTO.model_dump(exclude_unset=True)
+    # 使用模型生成新题目
+    res = generate_question(questionDTO.number, questionDTO.courseName, questionDTO.chapterName, questionDTO.difficulty)
 
-    # TODO 使用模型生成新题目
-    questions = [{}, {}, {}]
-
-    return Result.success(questions)
+    questionList = []
+    for q in res:
+        questionList.append(QuestionVO(courseName=questionDTO.courseName,
+                                       chapterName=questionDTO.chapterName,
+                                       difficulty=questionDTO.difficulty,
+                                       **q))
+    return Result.success(questionList)
 
 
 @teacher_question.post("/question")
