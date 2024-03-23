@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter
+from tortoise import Tortoise
 
 from pojo.dto import AnswerListDTO
 from pojo.entity import Course, Assignment, Student_Assignment, Assignment_Question, Question, Student_Answer
@@ -14,25 +15,28 @@ student_assignment = APIRouter()
 
 @student_assignment.get("/assignment")
 async def get_assignments(userId: int, courseId: Optional[int] = None):
-    # completed score submitTime userId assignmentId
-    assignments = await Student_Assignment.filter(userId=userId)
+    sql = '''
+    SELECT sa.id, sa.completed, sa.score, a.courseId, a.title, a.deadline, a.overdue, a.createTime
+    FROM student_assignment sa LEFT JOIN assignment a
+    ON sa.assignmentId = a.id
+    WHERE sa.userId = %s AND a.courseId = IFNULL(%s, a.courseId)
+    '''
+
+    result = await Tortoise.get_connection('default').execute_query(sql, [userId, courseId])
+    await Tortoise.close_connections()
+    assignments = result[1]
 
     assignmentList = []
     for a in assignments:
-        # courseName
-        assignment = await Assignment.get(id=a.assignmentId)
-        if courseId and assignment.courseId != courseId:
-            continue
-
-        course = await Course.get(id=assignment.courseId).values('courseName')
-        assignmentList.append(AssignmentVO(id=assignment.id,
+        course = await Course.get(id=a['courseId']).values('courseName')
+        assignmentList.append(AssignmentVO(id=a['id'],
                                            courseName=course['courseName'],
-                                           title=assignment.title,
-                                           deadline=parse(assignment.deadline),
-                                           overdue=assignment.overdue,
-                                           completed=a.completed,
-                                           score=a.score,
-                                           createTime=parse(assignment.createTime)))
+                                           title=a['title'],
+                                           deadline=parse(a['deadline']),
+                                           overdue=a['overdue'],
+                                           completed=a['completed'],
+                                           score=a['score'],
+                                           createTime=parse(a['createTime'])))
 
     return Result.success(assignmentList)
 
