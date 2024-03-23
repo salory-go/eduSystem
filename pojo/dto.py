@@ -12,7 +12,7 @@ class UserDTO(BaseModel):
 
 
 class QuestionDTO(BaseModel):
-    number: Optional[int] = None
+    number: int = 1
     courseName: Optional[str] = None
     chapterName: str = "综合练习"
     difficulty: int = 2
