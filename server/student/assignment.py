@@ -25,15 +25,14 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
             continue
 
         course = await Course.get(id=assignment.courseId).values('courseName')
-        assignmentVO = AssignmentVO(id=assignment.id,
-                                    courseName=course['courseName'],
-                                    title=assignment.title,
-                                    deadline=assignment.deadline,
-                                    overdue=assignment.overdue,
-                                    completed=a.completed,
-                                    score=a.score,
-                                    createTime=parse(assignment.createTime))
-        assignmentList.append(assignmentVO)
+        assignmentList.append(AssignmentVO(id=assignment.id,
+                                           courseName=course['courseName'],
+                                           title=assignment.title,
+                                           deadline=assignment.deadline,
+                                           overdue=assignment.overdue,
+                                           completed=a.completed,
+                                           score=a.score,
+                                           createTime=parse(assignment.createTime)))
 
     return Result.success(assignmentList)
 
@@ -47,7 +46,9 @@ async def get_assignment_detail(userId: int, assignmentId: int):
     questionList = []
     for qId in questionIds:
         try:
-            question = await Question.get(id=qId).values("id", "content", "difficulty")
+            question = await Question.get(id=qId).values("id",
+                                                         "content",
+                                                         "difficulty")
             questionList.append(question)
         finally:
             continue
@@ -66,17 +67,23 @@ async def submit_assignment(answerListDTO: AnswerListDTO):
         q = await Question.get(id=sAnswer.questionId).values('content', 'answer')
         score = generate_eval(q['content'], sAnswer.studentAnswer, q['answer'])
         weighted_score += score / num
-        studentAnswer = await Student_Answer.filter(userId=answerListDTO.userId, questionId=sAnswer.questionId).first()
+        studentAnswer = await (Student_Answer
+                               .filter(userId=answerListDTO.userId, questionId=sAnswer.questionId)
+                               .first())
 
         if studentAnswer:
-            await Student_Answer.filter(userId=answerListDTO.userId, questionId=sAnswer.questionId).update(
-                studentAnswer=sAnswer.studentAnswer, score=score)
+            await (Student_Answer
+                   .filter(userId=answerListDTO.userId, questionId=sAnswer.questionId)
+                   .update(studentAnswer=sAnswer.studentAnswer, score=score))
         else:
-            await Student_Answer.create(userId=answerListDTO.userId, questionId=sAnswer.questionId,
-                                        studentAnswer=sAnswer.studentAnswer, score=score)
+            await Student_Answer.create(userId=answerListDTO.userId,
+                                        questionId=sAnswer.questionId,
+                                        studentAnswer=sAnswer.studentAnswer,
+                                        score=score)
 
     # 加权评分
-    await Student_Assignment.filter(userId=answerListDTO.userId, assignmentId=answerListDTO.assignmentId).update(
-        completed=True, score=weighted_score)
+    await (Student_Assignment
+           .filter(userId=answerListDTO.userId, assignmentId=answerListDTO.assignmentId)
+           .update(completed=True, score=weighted_score))
 
     return Result.success()

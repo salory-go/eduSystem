@@ -14,7 +14,8 @@ student_question = APIRouter()
 
 
 @student_question.get("/question")
-async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int] = None,
+async def get_questions(courseId: Optional[int] = None,
+                        difficulty: Optional[int] = None,
                         chapterId: Optional[int] = None):
     query = {
         'courseId': courseId,
@@ -29,10 +30,12 @@ async def get_questions(courseId: Optional[int] = None, difficulty: Optional[int
         course = await Course.get(id=q["courseId"]).values('courseName')
         chapter = await Chapter.get(id=q["chapterId"]).values('chapterName')
 
-        questionVO = QuestionVO(id=q["id"], courseName=course["courseName"], chapterName=chapter["chapterName"],
-                                content=q["content"],
-                                difficulty=q["difficulty"])
-        questionList.append(questionVO)
+        questionList.append(QuestionVO(id=q["id"],
+                                       courseName=course["courseName"],
+                                       chapterName=chapter["chapterName"],
+                                       content=q["content"],
+                                       difficulty=q["difficulty"])
+                            .model_dump(exclude_unset=True))
 
     return Result.success(questionList)
 

@@ -24,13 +24,20 @@ async def get_stars(userId: int, courseId: Optional[int] = None):
 
     starList = []
     for s in stars:
-        q = await Question.get(id=s['questionId']).values("id", "courseId", "chapterId", "content", "difficulty")
+        q = await Question.get(id=s['questionId']).values("id",
+                                                          "courseId",
+                                                          "chapterId",
+                                                          "content",
+                                                          "difficulty")
         course = await Course.get(id=q["courseId"]).values('courseName')
         chapter = await Chapter.get(id=q["chapterId"]).values('chapterName')
 
-        starVO = QuestionVO(id=q["id"], courseName=course["courseName"], chapterName=chapter["chapterName"],
-                           content=q["content"], difficulty=q["difficulty"], createTime=parse(s['createTime']))
-        starList.append(starVO)
+        starList.append(QuestionVO(id=q["id"],
+                                   courseName=course["courseName"],
+                                   chapterName=chapter["chapterName"],
+                                   content=q["content"],
+                                   difficulty=q["difficulty"],
+                                   createTime=parse(s['createTime'])))
 
     return Result.success(starList)
 
