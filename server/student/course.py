@@ -21,11 +21,11 @@ async def get_courses():
     courseList = []
     for c in courses:
         user = await User.get(id=c['userId']).values('name')
-        courseList.append(CourseVO(id=c['courseId'],
+        courseList.append(CourseVO(id=c['id'],
                                    image=c['image'],
                                    courseName=c['courseName'],
                                    teacherName=user['name'],
-                                   createTime=parse(c['createTime'])))
+                                   createTime=parse(c['createTime'])).model_dump(exclude_unset=True))
     return Result.success(courseList)
 
 
@@ -38,13 +38,14 @@ async def get_my_courses(userId: int):
                                                            'image',
                                                            'courseName',
                                                            'userId')
-        user = await User.get(id=c['userId']).values('name')
+        user = await User.get(id=course['userId']).values('name')
 
-        courseList.append(CourseVO(id=course['courseId'],
+        courseList.append(CourseVO(id=course['id'],
                                    image=course['image'],
                                    courseName=course['courseName'],
                                    teacherName=user['name'],
-                                   joinTime=parse(c['joinTime'])))
+                                   joinTime=parse(c['joinTime']))
+                           .model_dump(exclude_unset=True))
 
     return Result.success(courseList)
 

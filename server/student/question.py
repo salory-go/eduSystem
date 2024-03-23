@@ -66,7 +66,7 @@ async def get_reference(questionId: int):
 
     # 用大模型生成解析
     res = generate_refer(question['content'], course['courseName'], chapter['chapterName'])
-
+    print(res)
     reference = ReferenceVO(**res, answer=question['answer'])
     return Result.success(reference)
 
@@ -74,8 +74,9 @@ async def get_reference(questionId: int):
 @student_question.get("/question/history")
 async def get_history_answer(userId: int, questionId: int):
     studentAnswer = await Student_Answer.filter(userId=userId, questionId=questionId).first()
-    answerVO = AnswerVO(studentAnswer=studentAnswer.studentAnswer, score=studentAnswer.score,
-                        submitTime=studentAnswer.submitTime)
+    answerVO = AnswerVO(studentAnswer=studentAnswer.studentAnswer,
+                        score=studentAnswer.score,
+                        submitTime=parse(studentAnswer.submitTime)).model_dump(exclude_unset=True)
     if studentAnswer:
         return Result.success(answerVO)
     else:

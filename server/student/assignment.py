@@ -28,7 +28,7 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
         assignmentList.append(AssignmentVO(id=assignment.id,
                                            courseName=course['courseName'],
                                            title=assignment.title,
-                                           deadline=assignment.deadline,
+                                           deadline=parse(assignment.deadline),
                                            overdue=assignment.overdue,
                                            completed=a.completed,
                                            score=a.score,
@@ -83,7 +83,7 @@ async def submit_assignment(answerListDTO: AnswerListDTO):
 
     # 加权评分
     await (Student_Assignment
-           .filter(userId=answerListDTO.userId, assignmentId=answerListDTO.assignmentId)
+           .filter(assignmentId=answerListDTO.assignmentId, userId=answerListDTO.userId)
            .update(completed=True, score=weighted_score))
 
     return Result.success()
