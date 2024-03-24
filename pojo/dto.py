@@ -13,7 +13,8 @@ class UserDTO(BaseModel):
 
 class QuestionDTO(BaseModel):
     number: int = 1
-    courseName: Optional[str] = None
+    isSimilar: bool = False
+    courseName: str = "计算机网络"
     chapterName: str = "综合练习"
     difficulty: int = 2
     topic: Optional[List[str]] = None
@@ -23,6 +24,7 @@ class QuestionDTO(BaseModel):
 
 class AssignmentDTO(BaseModel):
     courseId: int
+    chapterId: int
     userId: int
     title: str
     isPersonalized: bool
