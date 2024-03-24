@@ -14,12 +14,6 @@ def print_with_typewriter_effect(text, delay=0.05):
         time.sleep(delay)
 
 
-# if response:
-#     for chunk in response:
-#         content = chunk.choices[0].delta.content
-#         print_with_typewriter_effect(content)
-
-
 def create(message: List[dict],
            top_p: float = 0.7,
            temperature: float = 0.9,
@@ -31,6 +25,7 @@ def create(message: List[dict],
         temperature=temperature,
         max_tokens=max_tokens,
     )
+
     return res.choices[0].message.content
 
 
@@ -85,3 +80,4 @@ def generate_question(number: int,
     return process(create(messages))
 
 # print_with_typewriter_effect(generate_ideas("在数据链路层中，什么是帧？请简述帧的主要作用。", "计算机网络", "数据链路层"))
+# generate_question(2, '计算机组成原理', 'cpu', 3)
