@@ -3,11 +3,11 @@ from typing import Optional
 
 from fastapi import APIRouter, Response
 
-from pojo.dto import AnswerDTO
+from pojo.dto import AnswerDTO, QuestionDTO
 from pojo.entity import Course, Question, Chapter, Student_Answer
 from pojo.vo import QuestionVO, ReferenceVO, AnswerVO
 from pojo.result import Result
-from util.chatglmApi import generate_eval, generate_refer
+from util.chatglmApi import generate_eval, generate_refer, generate_question
 from util.dateParse import parse
 
 student_question = APIRouter()
@@ -82,3 +82,21 @@ async def get_history_answer(userId: int, questionId: int):
     else:
         result = json.dumps(Result.error('未曾作答').model_dump())
         return Response(status_code=400, media_type="application/json", content=result)
+
+
+@student_question.post("/question/similar")
+async def get_similar(questionDTO: QuestionDTO):
+    res = generate_question(questionDTO.number,
+                            questionDTO.courseName,
+                            questionDTO.chapterName,
+                            questionDTO.difficulty,
+                            questionDTO.content)
+    questionList = []
+    for q in res:
+        questionList.append(QuestionVO(courseName=questionDTO.courseName,
+                                       chapterName=questionDTO.chapterName,
+                                       difficulty=questionDTO.difficulty,
+                                       **q)
+                            .model_dump(exclude_unset=True))
+
+    return Result.success(questionList)
