@@ -1,8 +1,8 @@
 import time
-from typing import List
+from typing import List, Optional
 from zhipuai import ZhipuAI
 
-from const.msg import refer_msg, eval_msg, question_msg, diff_map
+from const.msg import refer_msg, eval_msg, question_msg, diff_map, similar_msg
 from util.textProcess import process
 
 client = ZhipuAI(api_key="7b1516a49710d181bb671927898a14b4.OCE2vCoySXStxYzx")
@@ -63,12 +63,23 @@ def generate_eval(content: str,
 def generate_question(number: int,
                       courseName: str,
                       chapterName: str,
-                      difficulty: int):
+                      difficulty: int,
+                      content: Optional[str] = None):
     messages = [
         {"role": "system", "content": "你是一名计算机专业的大学教授。"},
         {
             "role": "user",
-            "content": question_msg % (number, courseName, chapterName, diff_map[difficulty])
+            "content":
+                similar_msg % (number,
+                               courseName,
+                               chapterName,
+                               diff_map[difficulty],
+                               content)
+                if content else
+                question_msg % (number,
+                                courseName,
+                                chapterName,
+                                diff_map[difficulty])
         }
     ]
     return process(create(messages))
