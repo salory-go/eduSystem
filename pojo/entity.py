@@ -53,6 +53,7 @@ class Chapter(Model):
 class Assignment(Model):
     id = fields.IntField(pk=True)
     courseId = fields.IntField(description="课程ID")
+    chapterId = fields.IntField(description="章节ID")
     userId = fields.IntField(description="教师ID")
     title = fields.CharField(max_length=32, description="作业标题")
     deadline = fields.DatetimeField(description="截止时间")
