@@ -9,7 +9,7 @@ class LoginVO(BaseModel):
 
 
 class QuestionVO(BaseModel):
-    id: Optional[int] = None
+    id: int
     courseName: str
     chapterName: str
     difficulty: int
@@ -21,6 +21,7 @@ class QuestionVO(BaseModel):
 class AssignmentVO(BaseModel):
     id: int
     courseName: str
+    chapterName: str
     title: str
     deadline: int
     overdue: bool
