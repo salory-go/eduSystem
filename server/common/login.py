@@ -8,6 +8,8 @@ from pojo.vo import LoginVO
 from pojo.result import Result
 from tortoise.exceptions import DoesNotExist
 
+from util.jwtToken import generate
+
 login = APIRouter()
 
 
@@ -17,8 +19,9 @@ async def user_login(userDTO: UserDTO):
         user = await User.get(userNumber=userDTO.userNumber,
                               password=userDTO.password,
                               role=userDTO.role)
-        # TODO JWT Token生成
-        token = '这是token'
+        # JWT Token生成
+        payload = dict(userNumber=user.id)
+        token = generate(payload)
         return Result.success(LoginVO(id=user.id, token=token))
     except DoesNotExist:
         result = json.dumps(Result.error("账号或密码错误！").model_dump())
