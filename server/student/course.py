@@ -1,7 +1,7 @@
 import json
 
 from fastapi import APIRouter, Response
-from pojo.entity import Course, Student_Course, User
+from pojo.entity import Course, Student_Course, User, Chapter
 from pojo.vo import CourseVO
 from pojo.result import Result
 from tortoise.exceptions import DoesNotExist
@@ -48,6 +48,12 @@ async def get_my_courses(userId: int):
                           .model_dump(exclude_unset=True))
 
     return Result.success(courseList)
+
+
+@student_course.get("/course/chapter")
+async def get_chapters(courseId: int):
+    chapterList = await Chapter.filter(courseId=courseId).values('id', 'chapterName')
+    return Result.success(chapterList)
 
 
 @student_course.post("/course")
