@@ -51,17 +51,27 @@ async def get_questions(userId: int,
 @teacher_question.post("/question/new")
 async def new_questions(questionDTO: QuestionDTO):
     # 使用模型生成新题目
-    res = generate_question(questionDTO.number,
-                            questionDTO.courseName,
-                            questionDTO.chapterName,
-                            questionDTO.difficulty)
-
+    if questionDTO.isSimilar:
+        res = generate_question(questionDTO.number,
+                                questionDTO.courseName,
+                                questionDTO.chapterName,
+                                questionDTO.difficulty,
+                                questionDTO.content)
+    else:
+        res = generate_question(questionDTO.number,
+                                questionDTO.courseName,
+                                questionDTO.chapterName,
+                                questionDTO.difficulty)
     questionList = []
+    i = 1
     for q in res:
-        questionList.append(QuestionVO(courseName=questionDTO.courseName,
+        questionList.append(QuestionVO(id=i,
+                                       courseName=questionDTO.courseName,
                                        chapterName=questionDTO.chapterName,
                                        difficulty=questionDTO.difficulty,
-                                       **q).model_dump(exclude_unset=True))
+                                       **q)
+                            .model_dump(exclude_unset=True))
+        i += 1
     return Result.success(questionList)
 
 

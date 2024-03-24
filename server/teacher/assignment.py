@@ -20,6 +20,7 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
 
     assignments = await Assignment.filter(**query).values('id',
                                                           'courseId',
+                                                          'chapterId',
                                                           'title',
                                                           'deadline',
                                                           'overdue',
@@ -28,13 +29,16 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
     assignmentList = []
     for a in assignments:
         course = await Course.get(id=a['courseId']).values('courseName')
+        chapter = await Chapter.get(id=a['chapterId']).values('chapterName')
 
         assignmentList.append(AssignmentVO(id=a['id'],
                                            courseName=course['courseName'],
+                                           chapterName=chapter['chapterName'],
                                            title=a['title'],
                                            deadline=parse(a['deadline']),
                                            overdue=a['overdue'],
-                                           createTime=parse(a['createTime'])).model_dump(exclude_unset=True))
+                                           createTime=parse(a['createTime']))
+                              .model_dump(exclude_unset=True))
 
     return Result.success(assignmentList)
 
@@ -64,10 +68,9 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
             p = user['personalization']
 
             # 模型生成
-            select_questions = [1, 2, 3]
             new_questions = [{}, {}, {}]
             # 格式 courseName chapterName content answer difficulty
-            questionIds = [*select_questions]
+            questionIds = []
 
             for question in new_questions:
                 course = await Course.get(courseName=question['courseName']).values('id')
