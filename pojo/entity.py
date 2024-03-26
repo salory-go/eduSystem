@@ -9,7 +9,6 @@ class User(Model):
     email = fields.CharField(max_length=32, description="电子邮箱", unique=True)
     name = fields.CharField(max_length=32, description="姓名")
     role = fields.IntField(description="角色(1.教师2.管理员3.学生)")
-    personalization = fields.CharField(max_length=32, description="个性化内容", default="")  # 格式待定
     createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
     updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
@@ -68,8 +67,8 @@ class Assignment_Question(Model):
     assignmentId = fields.IntField(description="作业ID")
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
-    studentAnswer = fields.TextField(max_length=200, description="学生答案",default="")
-    score = fields.FloatField(description="得分",default=0)
+    studentAnswer = fields.TextField(max_length=500, description="学生答案", default="")
+    score = fields.FloatField(description="得分", default=0)
 
 
 class Student_Answer(Model):
@@ -93,5 +92,22 @@ class Star(Model):
     id = fields.IntField(pk=True)
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+
+
+class Question_Recommend(Model):
+    id = fields.IntField(pk=True)
+    userId = fields.IntField(description="学生ID")
+    courseName = fields.CharField(max_length=50, description="课程名称")
+    chapterName = fields.CharField(max_length=50, description="章节名称")
+    content = fields.TextField(max_length=500, description="推荐内容")
+    difficulty = fields.IntField(description="题目难度")
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
+
+
+class Behavior(Model):
+    id = fields.IntField(pk=True)
+    userId = fields.IntField(description="学生ID")
+    behavior = fields.TextField(description='学生行为')
     createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
 
