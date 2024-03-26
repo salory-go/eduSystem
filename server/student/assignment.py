@@ -63,31 +63,13 @@ async def get_assignment_detail(userId: int, assignmentId: int):
 @student_assignment.post("/assignment")
 async def submit_assignment(answerListDTO: AnswerListDTO):
     # 通过两个id来查询答案和学生表
-    num = len(answerListDTO.answers)
-    weighted_score = 0.0
-
     for sAnswer in answerListDTO.answers:
-        # 打分
-        q = await Question.get(id=sAnswer.questionId).values('content', 'answer')
-        score = generate_eval(q['content'], sAnswer.studentAnswer, q['answer'])
-        weighted_score += score / num
-        studentAnswer = await (Student_Answer
-                               .filter(userId=answerListDTO.userId, questionId=sAnswer.questionId)
-                               .first())
+        await (Assignment_Question
+               .filter(userId=answerListDTO.userId, questionId=sAnswer.questionId)
+               .update(studentAnswer=sAnswer.studentAnswer))
 
-        if studentAnswer:
-            await (Student_Answer
-                   .filter(userId=answerListDTO.userId, questionId=sAnswer.questionId)
-                   .update(studentAnswer=sAnswer.studentAnswer, score=score))
-        else:
-            await Student_Answer.create(userId=answerListDTO.userId,
-                                        questionId=sAnswer.questionId,
-                                        studentAnswer=sAnswer.studentAnswer,
-                                        score=score)
-
-    # 加权评分
     await (Student_Assignment
            .filter(assignmentId=answerListDTO.assignmentId, userId=answerListDTO.userId)
-           .update(completed=True, score=weighted_score))
+           .update(completed=True))
 
     return Result.success()

@@ -44,16 +44,15 @@ async def get_questions(courseId: Optional[int] = None,
 async def submit_answer(answerDTO: AnswerDTO):
     # 打分
     q = await Question.get(id=answerDTO.questionId).values('content', 'answer')
-    score = generate_eval(q['content'], answerDTO.studentAnswer, q['answer'])
 
     studentAnswer = await Student_Answer.filter(userId=answerDTO.userId, questionId=answerDTO.questionId).first()
 
     if studentAnswer:
         await Student_Answer.filter(userId=answerDTO.userId, questionId=answerDTO.questionId).update(
-            studentAnswer=answerDTO.studentAnswer, score=score)
+            studentAnswer=answerDTO.studentAnswer)
     else:
         await Student_Answer.create(userId=answerDTO.userId, questionId=answerDTO.questionId,
-                                    studentAnswer=answerDTO.studentAnswer, score=score)
+                                    studentAnswer=answerDTO.studentAnswer)
 
     return Result.success()
 
