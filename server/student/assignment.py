@@ -44,19 +44,16 @@ async def get_assignments(userId: int, courseId: Optional[int] = None):
 @student_assignment.get("/assignment/detail")
 async def get_assignment_detail(userId: int, assignmentId: int):
     # 通过assignmentId查询assignment_question的questionIds
-    q = await Assignment_Question.get(userId=userId, assignmentId=assignmentId)
-    questionIds = list(q.questionIds)
+    questionIds = await (Assignment_Question.filter(userId=userId, assignmentId=assignmentId)
+                         .values_list('questionId', flat=True))
+
     # 用questionIds查询content、difficulty、两个time
     questionList = []
     for qId in questionIds:
-        try:
-            question = await Question.get(id=qId).values("id",
-                                                         "content",
-                                                         "difficulty")
-            questionList.append(question)
-        finally:
-            continue
-
+        question = await Question.get(id=qId).values("id",
+                                                     "content",
+                                                     "difficulty")
+        questionList.append(question)
     return Result.success(questionList)
 
 
