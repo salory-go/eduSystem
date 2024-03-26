@@ -3,7 +3,7 @@ from util.dateParse import parse
 from fastapi import APIRouter, Query
 from typing import Optional, List
 
-from pojo.entity import Question, Course, Chapter, Star, Student_Answer
+from pojo.entity import Question, Course, Chapter, Star, Student_Answer, Assignment_Question
 from pojo.dto import QuestionDTO, QuestionListDTO
 from pojo.vo import QuestionVO
 from pojo.result import Result
@@ -97,6 +97,7 @@ async def add_questions(questionList: QuestionListDTO):
 @teacher_question.delete("/question")
 async def del_question(questionIds: List[int] = Query(...)):
     await Question.filter(id__in=questionIds).delete()
+    await Assignment_Question.filter(questionId__in=questionIds).delete()
     await Star.filter(questionId__in=questionIds).delete()
     await Student_Answer.filter(questionId__in=questionIds).delete()
     return Result.success()

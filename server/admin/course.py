@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query
 from pojo.dto import CourseDTO
 from pojo.entity import User, Course, Question, Student_Course, Chapter, Assignment, Student_Assignment
 from pojo.vo import CourseVO
+from server.teacher.assignment import del_assignment
 from server.teacher.question import del_question
 from pojo.result import Result
 from util.dateParse import parse
@@ -59,13 +60,10 @@ async def del_course(courseIds: List[int] = Query(...)):
 
     # assignment
     assignmentIds = await Assignment.filter(courseId__in=courseIds).values_list('id', flat=True)
-    for aId in assignmentIds:
-        await Student_Assignment.filter(assignmentId=aId).delete()
-    await Assignment.filter(courseId__in=courseIds).delete()
+    await del_assignment(assignmentIds)
 
     # question
     questionIds = await Question.filter(courseId__in=courseIds).values_list('id', flat=True)
     await del_question(questionIds)
-    await Question.filter(courseId__in=courseIds).delete()
 
     return Result.success()

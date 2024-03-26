@@ -104,65 +104,59 @@ async def create_assignment(assignmentDTO: AssignmentDTO):
 async def del_assignment(assignmentIds: List[int] = Query(...)):
     await Assignment.filter(id__in=assignmentIds).delete()
     await Student_Assignment.filter(assignmentId__in=assignmentIds).delete()
+    await Assignment_Question.filter(assignmentId__in=assignmentIds).delete()
     return Result.success()
 
 
 @teacher_assignment.get("/assignment/{assignmentId}")
-async def get_specific_assignments(assignmentId: int):
-    assignments = await Student_Assignment.filter(assignmentId=assignmentId)
+async def get_student_assignments(assignmentId: int):
+    assignments = await (Student_Assignment.filter(assignmentId=assignmentId)
+                         .values('userId', 'completed', 'score'))
     assignmentList = []
     for a in assignments:
-        user = await User.get(id=a.userId)
+        user = await User.get(id=a['userId']).values('userNumber', 'name')
         assignmentList.append(AssignmentCircumstanceVO(
-            userId=a.userId,
-            userNumber=user.userNumber,
-            name=user.name,
-            completed=a.completed,
-            score=a.score,
-        ))
+            userId=a['userId'],
+            userNumber=user['userNumber'],
+            name=user['name'],
+            completed=a['completed'],
+            score=a['score']))
     return Result.success(assignmentList)
 
 
-@teacher_assignment.get("/detail")
-async def get_student_assignment_detail(userId: int, assignmentId: int, ):
+@teacher_assignment.get("/assignment/detail")
+async def get_student_assignment_detail(userId: int, assignmentId: int):
     student_assignments = await (Assignment_Question.filter(userId=userId, assignmentId=assignmentId)
                                  .values('questionId', 'studentAnswer', 'score'))
-    data = []
+    assignmentList = []
     for a in student_assignments:
         question = await Question.get(id=a['questionId']).values('content', 'difficulty')
-        data.append(QuestionVO(
-            id=a['questionId'],
-            content=question['content'],
-            difficulty=question['difficulty'],
-            answer=a['studentAnswer'],
-            score=a['score'])
-        .model_dump(exclude_unset=True))
-    return Result.success(data)
+        assignmentList.append(QuestionVO(id=a['questionId'],
+                                         content=question['content'],
+                                         difficulty=question['difficulty'],
+                                         answer=a['studentAnswer'],
+                                         score=a['score'])
+                              .model_dump(exclude_unset=True))
+    return Result.success(assignmentList)
 
 
 @teacher_assignment.post("/grade")
 async def grade(assignmentGradeDTO: AssignmentGradeDTO):
-    await Student_Assignment.filter(userId=assignmentGradeDTO.userId,
-                                    assignmentId=assignmentGradeDTO.assignmentId).update(
-        score=assignmentGradeDTO.assignmentScore)
-    for q in assignmentGradeDTO.gradings:
-        if await Assignment_Question.filter(userId=assignmentGradeDTO.userId,
-                                            assignmentId=assignmentGradeDTO.assignmentId,
-                                            questionId=q.questionId).first():
+    await (Student_Assignment
+           .filter(userId=assignmentGradeDTO.userId, assignmentId=assignmentGradeDTO.assignmentId)
+           .update(score=assignmentGradeDTO.assignmentScore))
 
-            await Assignment_Question.filter(userId=assignmentGradeDTO.userId,
-                                             assignmentId=assignmentGradeDTO.assignmentId,
-                                             questionId=q.questionId).update(score=q.score)
-        else:
-            await Assignment_Question.create(userId=assignmentGradeDTO.userId,
-                                             assignmentId=assignmentGradeDTO.assignmentId,
-                                             questionId=q.questionId,
-                                             score=q.score)
+    for q in assignmentGradeDTO.grades:
+        await (Assignment_Question
+               .filter(userId=assignmentGradeDTO.userId,
+                       assignmentId=assignmentGradeDTO.assignmentId,
+                       questionId=q.questionId)
+               .update(score=q.score))
     return Result.success()
 
 
 @teacher_assignment.post("/assignment/autograde")
-async def autograde_assignments(assignmentId: int):
+async def autograde(assignmentId: int):
     # 对所有的学生作业进行批改
     # 对某个学生的所有题目打分之后再对作业打分
     assignmentQuestions = await Assignment_Question.filter(assignmentId=assignmentId)
@@ -175,7 +169,8 @@ async def autograde_assignments(assignmentId: int):
             "studentAnswer")
         score = generate_eval(question['content'], student_answer['studentAnswer'], question['answer'])
         # 题目打分
-        await Assignment_Question.filter(assignmentId=assignmentId,questionId=questionId, userId=studentId).update(score=score)
+        await Assignment_Question.filter(assignmentId=assignmentId, questionId=questionId, userId=studentId).update(
+            score=score)
     # 作业打分
     assignmentGrade = await Student_Assignment.filter(assignmentId=assignmentId).values("userId")
     for a in assignmentGrade:
