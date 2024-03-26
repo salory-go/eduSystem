@@ -14,8 +14,8 @@ class UserDTO(BaseModel):
 class QuestionDTO(BaseModel):
     number: int = 1
     isSimilar: bool = False
-    courseName: str
-    chapterName: str
+    courseName: Optional[str] = None
+    chapterName: Optional[str] = None
     difficulty: int = 2
     topic: Optional[List[str]] = None
     content: Optional[str] = None
@@ -23,13 +23,13 @@ class QuestionDTO(BaseModel):
 
 
 class AssignmentDTO(BaseModel):
-    courseId: int
-    chapterId: int
-    userId: int
-    title: str
-    isPersonalized: bool
+    courseId: Optional[int] = None
+    chapterId: Optional[int] = None
+    userId: Optional[int] = None
+    title: Optional[str] = None
+    isPersonalized: bool = False
     questionIds: Optional[List[int]] = None
-    deadline: int
+    deadline: Optional[int] = None
 
 
 class CourseDTO(BaseModel):
@@ -60,13 +60,14 @@ class StarDTO(BaseModel):
     userId: int
     questionId: int
 
+
 class QuestionGradeDTO(BaseModel):
     questionId: int
     score: float
+
 
 class AssignmentGradeDTO(BaseModel):
     userId: int
     assignmentId: int
     assignmentScore: float
-    gradings: List[QuestionGradeDTO]
-
+    grades: List[QuestionGradeDTO]
