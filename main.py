@@ -11,7 +11,7 @@ from server.common.router import common
 from server.student.router import student
 from server.teacher.router import teacher
 from pojo.result import Result
-from task.assignmentTask import scheduler
+from task.Tasks import scheduler
 from util.jwtToken import verify
 
 app = FastAPI()
