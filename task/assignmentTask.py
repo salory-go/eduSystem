@@ -2,6 +2,7 @@ from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from pojo.entity import Assignment
+from util.dateParse import parse
 from util.logger import logger
 
 scheduler = AsyncIOScheduler()
@@ -13,5 +14,5 @@ async def check_overdue():
 
     assignments = await Assignment.filter(overdue=False).values('id', 'deadline')
     for a in assignments:
-        if a['deadline'] < datetime.now().replace(microsecond=0):
+        if parse(a['deadline']) < datetime.now().timestamp():
             await Assignment.filter(id=a['id']).update(overdue=True)
