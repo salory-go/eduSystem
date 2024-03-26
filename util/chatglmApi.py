@@ -80,5 +80,6 @@ def generate_question(number: int,
     print(create(messages))
     return process(create(messages))
 
-# print_with_typewriter_effect(generate_ideas("在数据链路层中，什么是帧？请简述帧的主要作用。", "计算机网络", "数据链路层"))
-# generate_question(2, '计算机网络', '物理层', 3,"物理层的主要功能是什么？")
+
+def generate_recommend(behaviors: List[str], number: int = 30):
+    pass
