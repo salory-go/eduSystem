@@ -10,11 +10,12 @@ class LoginVO(BaseModel):
 
 class QuestionVO(BaseModel):
     id: Optional[int] = None
-    courseName: str
-    chapterName: str
-    difficulty: int
-    content: str
+    courseName: Optional[str] = None
+    chapterName: Optional[str] = None
+    difficulty: Optional[int] = None
+    content: Optional[str] = None
     answer: Optional[str] = None
+    score: Optional[float] = None
     createTime: Optional[int] = None
 
 
@@ -49,3 +50,11 @@ class AnswerVO(BaseModel):
     studentAnswer: str
     score: float
     submitTime: int
+
+
+class AssignmentCircumstanceVO(BaseModel):
+    userId: int
+    userNumber: str
+    name: str
+    completed: bool
+    score: float

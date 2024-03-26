@@ -10,7 +10,7 @@ class User(Model):
     name = fields.CharField(max_length=32, description="姓名")
     role = fields.IntField(description="角色(1.教师2.管理员3.学生)")
     personalization = fields.CharField(max_length=32, description="个性化内容", default="")  # 格式待定
-    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True, )
+    createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
     updateTime = fields.DatetimeField(description="更新时间", auto_now=True)
 
 
@@ -68,7 +68,8 @@ class Assignment_Question(Model):
     assignmentId = fields.IntField(description="作业ID")
     userId = fields.IntField(description="学生ID")
     questionId = fields.IntField(description="题目ID")
-    score = fields.FloatField(description="得分")
+    studentAnswer = fields.TextField(max_length=200, description="学生答案",default="")
+    score = fields.FloatField(description="得分",default=0)
 
 
 class Student_Answer(Model):
@@ -94,16 +95,3 @@ class Star(Model):
     questionId = fields.IntField(description="题目ID")
     createTime = fields.DatetimeField(description="创建时间", auto_now_add=True)
 
-# class Exam(Model):
-#     id = fields.IntField(pk=True)
-#     title = fields.CharField(max_length=32,description="试卷标题")
-#     description = fields.CharField(max_length=100,description="试卷描述")
-#     teacherId = fields.IntField(description="创建者")
-#     createTime = fields.DatetimeField(description="创建时间")
-#     updateTime = fields.DatetimeField(description="更新时间")
-#
-# class Exam_Question(Model):
-#     id = fields.IntField(pk=True)
-#     examId = fields.IntField(description="试卷ID")
-#     questionId = fields.IntField(description="题目ID")
-#     weight = fields.IntField(description="题目权重")

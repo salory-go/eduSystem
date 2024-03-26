@@ -14,8 +14,8 @@ class UserDTO(BaseModel):
 class QuestionDTO(BaseModel):
     number: int = 1
     isSimilar: bool = False
-    courseName: str = "计算机网络"
-    chapterName: str = "综合练习"
+    courseName: str
+    chapterName: str
     difficulty: int = 2
     topic: Optional[List[str]] = None
     content: Optional[str] = None
@@ -59,3 +59,14 @@ class AnswerListDTO(BaseModel):
 class StarDTO(BaseModel):
     userId: int
     questionId: int
+
+class QuestionGradeDTO(BaseModel):
+    questionId: int
+    score: float
+
+class AssignmentGradeDTO(BaseModel):
+    userId: int
+    assignmentId: int
+    assignmentScore: float
+    gradings: List[QuestionGradeDTO]
+
