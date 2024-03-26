@@ -19,7 +19,7 @@ async def assignment_task():
             await Assignment.filter(id=a['id']).update(overdue=True)
 
 
-@scheduler.scheduled_job(trigger=IntervalTrigger(days=1))
+@scheduler.scheduled_job(trigger=IntervalTrigger(seconds=10))
 async def recommend_task():
     logger.info("recommend questions...")
 

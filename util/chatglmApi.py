@@ -81,5 +81,5 @@ def generate_question(number: int,
     return process(create(messages))
 
 
-def generate_recommend(behaviors: List[str], number: int = 30):
-    pass
+def generate_recommend(behaviors: Optional[List[str]], number: int = 30):
+    return []
